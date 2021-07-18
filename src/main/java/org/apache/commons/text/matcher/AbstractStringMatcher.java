@@ -20,17 +20,177 @@ package org.apache.commons.text.matcher;
 import java.util.Arrays;
 
 /**
- * A matcher class that can be queried to determine if a character array portion matches.
+ * A matcher that determines if a character array portion matches.
  * <p>
- * This class comes complete with various factory methods. If these do not suffice, you can subclass and implement your
- * own matcher.
+ * Thread=safe.
+ * </p>
  *
  * @since 1.3
  */
 abstract class AbstractStringMatcher implements StringMatcher {
 
     /**
-     * Class used to define a character for matching purposes.
+     * Matches all of the given matchers in order.
+     *
+     * @since 1.9
+     */
+    static final class AndStringMatcher extends AbstractStringMatcher {
+
+        /**
+         * Matchers in order.
+         */
+        private final StringMatcher[] stringMatchers;
+
+        /**
+         * Constructs a new initialized instance.
+         *
+         * @param stringMatchers Matchers in order. Never null since the {@link StringMatcherFactory} uses the
+         *        {@link NoneMatcher} instead.
+         */
+        AndStringMatcher(final StringMatcher... stringMatchers) {
+            this.stringMatchers = stringMatchers.clone();
+        }
+
+        @Override
+        public int isMatch(final char[] buffer, final int start, final int bufferStart, final int bufferEnd) {
+            int total = 0;
+            int curStart = start;
+            for (final StringMatcher stringMatcher : stringMatchers) {
+                if (stringMatcher != null) {
+                    final int len = stringMatcher.isMatch(buffer, curStart, bufferStart, bufferEnd);
+                    if (len == 0) {
+                        return 0;
+                    }
+                    total += len;
+                    curStart += len;
+                }
+            }
+            return total;
+        }
+
+        @Override
+        public int isMatch(final CharSequence buffer, final int start, final int bufferStart, final int bufferEnd) {
+            int total = 0;
+            int curStart = start;
+            for (final StringMatcher stringMatcher : stringMatchers) {
+                if (stringMatcher != null) {
+                    final int len = stringMatcher.isMatch(buffer, curStart, bufferStart, bufferEnd);
+                    if (len == 0) {
+                        return 0;
+                    }
+                    total += len;
+                    curStart += len;
+                }
+            }
+            return total;
+        }
+
+        @Override
+        public int size() {
+            int total = 0;
+            for (final StringMatcher stringMatcher : stringMatchers) {
+                if (stringMatcher != null) {
+                    total += stringMatcher.size();
+                }
+            }
+            return total;
+        }
+    }
+
+    /**
+     * Matches out of a set of characters.
+     * <p>
+     * Thread=safe.
+     * </p>
+     */
+    static final class CharArrayMatcher extends AbstractStringMatcher {
+
+        /** The string to match, as a character array, implementation treats as immutable. */
+        private final char[] chars;
+
+        /** The string to match. */
+        private final String string;
+
+        /**
+         * Constructs a matcher from a String.
+         *
+         * @param chars the string to match, must not be null
+         */
+        CharArrayMatcher(final char... chars) {
+            this.string = String.valueOf(chars);
+            this.chars = chars.clone();
+        }
+
+        /**
+         * Returns the number of matching characters, {@code 0} if there is no match.
+         *
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd the end index of the active buffer, valid for buffer
+         * @return The number of matching characters, zero for no match
+         */
+        @Override
+        public int isMatch(final char[] buffer, final int start, final int bufferStart, final int bufferEnd) {
+            final int len = size();
+            if (start + len > bufferEnd) {
+                return 0;
+            }
+            int j = start;
+            for (int i = 0; i < len; i++, j++) {
+                if (chars[i] != buffer[j]) {
+                    return 0;
+                }
+            }
+            return len;
+        }
+
+        /**
+         * Returns the number of matching characters, {@code 0} if there is no match.
+         *
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd the end index of the active buffer, valid for buffer
+         * @return The number of matching characters, zero for no match
+         */
+        @Override
+        public int isMatch(final CharSequence buffer, final int start, final int bufferStart, final int bufferEnd) {
+            final int len = size();
+            if (start + len > bufferEnd) {
+                return 0;
+            }
+            int j = start;
+            for (int i = 0; i < len; i++, j++) {
+                if (chars[i] != buffer.charAt(j)) {
+                    return 0;
+                }
+            }
+            return len;
+        }
+
+        /**
+         * Returns the size of the string to match given in the constructor.
+         *
+         * @since 1.9
+         */
+        @Override
+        public int size() {
+            return chars.length;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + "[\"" + string + "\"]";
+        }
+
+    }
+
+    /**
+     * Matches a character.
+     * <p>
+     * Thread=safe.
+     * </p>
      */
     static final class CharMatcher extends AbstractStringMatcher {
 
@@ -38,37 +198,63 @@ abstract class AbstractStringMatcher implements StringMatcher {
         private final char ch;
 
         /**
-         * Constructor that creates a matcher that matches a single character.
+         * Constructs a matcher for a single character.
          *
-         * @param ch
-         *            the character to match
+         * @param ch the character to match
          */
         CharMatcher(final char ch) {
-            super();
             this.ch = ch;
         }
 
         /**
-         * Returns whether or not the given character matches.
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
          *
-         * @param buffer
-         *            the text content to match against, do not change
-         * @param start
-         *            the starting position for the match, valid for buffer
-         * @param bufferStart
-         *            the first active index in the buffer, valid for buffer
-         * @param bufferEnd
-         *            the end index of the active buffer, valid for buffer
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd unused
          * @return The number of matching characters, zero for no match
          */
         @Override
         public int isMatch(final char[] buffer, final int start, final int bufferStart, final int bufferEnd) {
             return ch == buffer[start] ? 1 : 0;
         }
+
+        /**
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
+         *
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd unused
+         * @return The number of matching characters, zero for no match
+         */
+        @Override
+        public int isMatch(final CharSequence buffer, final int start, final int bufferStart, final int bufferEnd) {
+            return ch == buffer.charAt(start) ? 1 : 0;
+        }
+
+        /**
+         * Returns 1.
+         *
+         * @since 1.9
+         */
+        @Override
+        public int size() {
+            return 1;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + "['" + ch + "']";
+        }
     }
 
     /**
-     * Class used to define a set of characters for matching purposes.
+     * Matches a set of characters.
+     * <p>
+     * Thread=safe.
+     * </p>
      */
     static final class CharSetMatcher extends AbstractStringMatcher {
 
@@ -76,122 +262,119 @@ abstract class AbstractStringMatcher implements StringMatcher {
         private final char[] chars;
 
         /**
-         * Constructor that creates a matcher from a character array.
+         * Constructs a matcher from a character array.
          *
-         * @param chars
-         *            the characters to match, must not be null
+         * @param chars the characters to match, must not be null
          */
         CharSetMatcher(final char[] chars) {
-            super();
             this.chars = chars.clone();
             Arrays.sort(this.chars);
         }
 
         /**
-         * Returns whether or not the given character matches.
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
          *
-         * @param buffer
-         *            the text content to match against, do not change
-         * @param start
-         *            the starting position for the match, valid for buffer
-         * @param bufferStart
-         *            the first active index in the buffer, valid for buffer
-         * @param bufferEnd
-         *            the end index of the active buffer, valid for buffer
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd unused
          * @return The number of matching characters, zero for no match
          */
         @Override
         public int isMatch(final char[] buffer, final int start, final int bufferStart, final int bufferEnd) {
             return Arrays.binarySearch(chars, buffer[start]) >= 0 ? 1 : 0;
         }
+
+        /**
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
+         *
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd unused
+         * @return The number of matching characters, zero for no match
+         */
+        @Override
+        public int isMatch(final CharSequence buffer, final int start, final int bufferStart, final int bufferEnd) {
+            return Arrays.binarySearch(chars, buffer.charAt(start)) >= 0 ? 1 : 0;
+        }
+
+        /**
+         * Returns 1.
+         *
+         * @since 1.9
+         */
+        @Override
+        public int size() {
+            return 1;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + Arrays.toString(chars);
+        }
+
     }
 
     /**
-     * Class used to match no characters.
+     * Matches nothing.
+     * <p>
+     * Thread=safe.
+     * </p>
      */
-    static final class NoMatcher extends AbstractStringMatcher {
+    static final class NoneMatcher extends AbstractStringMatcher {
 
         /**
          * Constructs a new instance of {@code NoMatcher}.
          */
-        NoMatcher() {
-            super();
+        NoneMatcher() {
         }
 
         /**
-         * Always returns {@code false}.
+         * Always returns {@code 0}.
          *
-         * @param buffer
-         *            the text content to match against, do not change
-         * @param start
-         *            the starting position for the match, valid for buffer
-         * @param bufferStart
-         *            the first active index in the buffer, valid for buffer
-         * @param bufferEnd
-         *            the end index of the active buffer, valid for buffer
+         * @param buffer unused
+         * @param start unused
+         * @param bufferStart unused
+         * @param bufferEnd unused
          * @return The number of matching characters, zero for no match
          */
         @Override
         public int isMatch(final char[] buffer, final int start, final int bufferStart, final int bufferEnd) {
             return 0;
         }
-    }
-
-    /**
-     * Class used to define a set of characters for matching purposes.
-     */
-    static final class StringMatcher extends AbstractStringMatcher {
-
-        /** The string to match, as a character array. */
-        private final char[] chars;
 
         /**
-         * Constructor that creates a matcher from a String.
+         * Always returns {@code 0}.
          *
-         * @param str
-         *            the string to match, must not be null
-         */
-        StringMatcher(final String str) {
-            super();
-            chars = str.toCharArray();
-        }
-
-        /**
-         * Returns whether or not the given text matches the stored string.
-         *
-         * @param buffer
-         *            the text content to match against, do not change
-         * @param start
-         *            the starting position for the match, valid for buffer
-         * @param bufferStart
-         *            the first active index in the buffer, valid for buffer
-         * @param bufferEnd
-         *            the end index of the active buffer, valid for buffer
+         * @param buffer unused
+         * @param start unused
+         * @param bufferStart unused
+         * @param bufferEnd unused
          * @return The number of matching characters, zero for no match
          */
         @Override
-        public int isMatch(final char[] buffer, int start, final int bufferStart, final int bufferEnd) {
-            final int len = chars.length;
-            if (start + len > bufferEnd) {
-                return 0;
-            }
-            for (int i = 0; i < chars.length; i++, start++) {
-                if (chars[i] != buffer[start]) {
-                    return 0;
-                }
-            }
-            return len;
+        public int isMatch(final CharSequence buffer, final int start, final int bufferStart, final int bufferEnd) {
+            return 0;
         }
 
+        /**
+         * Returns 0.
+         *
+         * @since 1.9
+         */
         @Override
-        public String toString() {
-            return super.toString() + ' ' + Arrays.toString(chars);
+        public int size() {
+            return 0;
         }
 
     }
 
     /**
-     * Class used to match whitespace as per trim().
+     * Matches whitespace as per trim().
+     * <p>
+     * Thread=safe.
+     * </p>
      */
     static final class TrimMatcher extends AbstractStringMatcher {
 
@@ -204,25 +387,44 @@ abstract class AbstractStringMatcher implements StringMatcher {
          * Constructs a new instance of {@code TrimMatcher}.
          */
         TrimMatcher() {
-            super();
         }
 
         /**
-         * Returns whether or not the given character matches.
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
          *
-         * @param buffer
-         *            the text content to match against, do not change
-         * @param start
-         *            the starting position for the match, valid for buffer
-         * @param bufferStart
-         *            the first active index in the buffer, valid for buffer
-         * @param bufferEnd
-         *            the end index of the active buffer, valid for buffer
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd unused
          * @return The number of matching characters, zero for no match
          */
         @Override
         public int isMatch(final char[] buffer, final int start, final int bufferStart, final int bufferEnd) {
             return buffer[start] <= SPACE_INT ? 1 : 0;
+        }
+
+        /**
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
+         *
+         * @param buffer the text content to match against, do not change
+         * @param start the starting position for the match, valid for buffer
+         * @param bufferStart unused
+         * @param bufferEnd unused
+         * @return The number of matching characters, zero for no match
+         */
+        @Override
+        public int isMatch(final CharSequence buffer, final int start, final int bufferStart, final int bufferEnd) {
+            return buffer.charAt(start) <= SPACE_INT ? 1 : 0;
+        }
+
+        /**
+         * Returns 1.
+         *
+         * @since 1.9
+         */
+        @Override
+        public int size() {
+            return 1;
         }
     }
 
@@ -230,30 +432,20 @@ abstract class AbstractStringMatcher implements StringMatcher {
      * Constructor.
      */
     protected AbstractStringMatcher() {
-        super();
     }
 
-    /**
-     * Returns the number of matching characters, zero for no match.
-     * <p>
-     * This method is called to check for a match. The parameter {@code pos} represents the current position to be
-     * checked in the string {@code buffer} (a character array which must not be changed). The API guarantees that
-     * {@code pos} is a valid index for {@code buffer}.
-     * <p>
-     * The matching code may check one character or many. It may check characters preceding {@code pos} as well as
-     * those after.
-     * <p>
-     * It must return zero for no match, or a positive number if a match was found. The number indicates the number of
-     * characters that matched.
-     *
-     * @param buffer
-     *            the text content to match against, do not change
-     * @param pos
-     *            the starting position for the match, valid for buffer
-     * @return The number of matching characters, zero for no match
-     */
-    public int isMatch(final char[] buffer, final int pos) {
-        return isMatch(buffer, pos, 0, buffer.length);
-    }
+//    /**
+//     * Validates indices for {@code bufferStart <= start < bufferEnd}.
+//     *
+//     * @param start the starting position for the match, valid in {@code buffer}.
+//     * @param bufferStart the first active index in the buffer, valid in {@code buffer}.
+//     * @param bufferEnd the end index (exclusive) of the active buffer, valid in {@code buffer}.
+//     */
+//    void validate(final int start, final int bufferStart, final int bufferEnd) {
+//        if (((bufferStart > start) || (start >= bufferEnd))) {
+//            throw new IndexOutOfBoundsException(
+//                String.format("bufferStart(%,d) <= start(%,d) < bufferEnd(%,d)", bufferStart, start, bufferEnd));
+//        }
+//    }
 
 }

@@ -47,7 +47,7 @@ public class IntersectionSimilarity<T> implements SimilarityScore<IntersectionRe
      * Mutable counter class for storing the count of elements.
      */
     private static class BagCount {
-        /** The count. This is initialised to 1 upon construction. */
+        /** The count. This is initialized to 1 upon construction. */
         int count = 1;
     }
 
@@ -162,7 +162,7 @@ public class IntersectionSimilarity<T> implements SimilarityScore<IntersectionRe
         }
 
         // Intersection = count the number of shared elements
-        int intersection;
+        final int intersection;
         if (objectsA instanceof Set && objectsB instanceof Set) {
             // If a Set then the elements will only have a count of 1.
             // Iterate over the smaller set.

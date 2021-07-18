@@ -41,7 +41,7 @@ public class StringLookupFactoryTest {
         assertTrue(stringLookupMap.containsKey(InterpolatorStringLookup.toKey(StringLookupFactory.KEY_LOCALHOST)));
         assertTrue(stringLookupMap.containsKey(InterpolatorStringLookup.toKey(StringLookupFactory.KEY_PROPERTIES)));
         assertTrue(
-                stringLookupMap.containsKey(InterpolatorStringLookup.toKey(StringLookupFactory.KEY_RESOURCE_BUNDLE)));
+            stringLookupMap.containsKey(InterpolatorStringLookup.toKey(StringLookupFactory.KEY_RESOURCE_BUNDLE)));
         assertTrue(stringLookupMap.containsKey(InterpolatorStringLookup.toKey(StringLookupFactory.KEY_SCRIPT)));
         assertTrue(stringLookupMap.containsKey(InterpolatorStringLookup.toKey(StringLookupFactory.KEY_SYS)));
         assertTrue(stringLookupMap.containsKey(InterpolatorStringLookup.toKey(StringLookupFactory.KEY_URL)));
@@ -68,20 +68,23 @@ public class StringLookupFactoryTest {
     @Test
     public void testSingletons() {
         final StringLookupFactory stringLookupFactory = StringLookupFactory.INSTANCE;
-        Assertions.assertSame(Base64DecoderStringLookup.INSTANCE, stringLookupFactory.base64DecoderStringLookup());
-        Assertions.assertSame(Base64EncoderStringLookup.INSTANCE, stringLookupFactory.base64EncoderStringLookup());
+        Assertions.assertSame(StringLookupFactory.INSTANCE_BASE64_DECODER,
+            stringLookupFactory.base64DecoderStringLookup());
+        Assertions.assertSame(StringLookupFactory.INSTANCE_BASE64_ENCODER,
+            stringLookupFactory.base64EncoderStringLookup());
         Assertions.assertSame(ConstantStringLookup.INSTANCE, stringLookupFactory.constantStringLookup());
         Assertions.assertSame(DateStringLookup.INSTANCE, stringLookupFactory.dateStringLookup());
         Assertions.assertSame(DnsStringLookup.INSTANCE, stringLookupFactory.dnsStringLookup());
-        Assertions.assertSame(EnvironmentVariableStringLookup.INSTANCE,
-                stringLookupFactory.environmentVariableStringLookup());
+        Assertions.assertSame(StringLookupFactory.INSTANCE_ENVIRONMENT_VARIABLES,
+            stringLookupFactory.environmentVariableStringLookup());
         Assertions.assertSame(InterpolatorStringLookup.INSTANCE, stringLookupFactory.interpolatorStringLookup());
         Assertions.assertSame(JavaPlatformStringLookup.INSTANCE, stringLookupFactory.javaPlatformStringLookup());
         Assertions.assertSame(LocalHostStringLookup.INSTANCE, stringLookupFactory.localHostStringLookup());
-        Assertions.assertSame(NullStringLookup.INSTANCE, stringLookupFactory.nullStringLookup());
+        Assertions.assertSame(StringLookupFactory.INSTANCE_NULL, stringLookupFactory.nullStringLookup());
         Assertions.assertSame(ResourceBundleStringLookup.INSTANCE, stringLookupFactory.resourceBundleStringLookup());
         Assertions.assertSame(ScriptStringLookup.INSTANCE, stringLookupFactory.scriptStringLookup());
-        Assertions.assertSame(SystemPropertyStringLookup.INSTANCE, stringLookupFactory.systemPropertyStringLookup());
+        Assertions.assertSame(StringLookupFactory.INSTANCE_SYSTEM_PROPERTIES,
+            stringLookupFactory.systemPropertyStringLookup());
         Assertions.assertSame(UrlDecoderStringLookup.INSTANCE, stringLookupFactory.urlDecoderStringLookup());
         Assertions.assertSame(UrlEncoderStringLookup.INSTANCE, stringLookupFactory.urlEncoderStringLookup());
         Assertions.assertSame(UrlStringLookup.INSTANCE, stringLookupFactory.urlStringLookup());

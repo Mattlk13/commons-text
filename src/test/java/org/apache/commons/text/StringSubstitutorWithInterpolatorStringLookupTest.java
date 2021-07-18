@@ -32,6 +32,33 @@ import org.junit.jupiter.api.Test;
 public class StringSubstitutorWithInterpolatorStringLookupTest {
 
     @Test
+    public void testCustomFunctionWithDefaults() {
+        testCustomFunctionWithDefaults(true);
+    }
+
+    private void testCustomFunctionWithDefaults(final boolean addDefaultLookups) {
+        final String key = "key";
+        final String value = "value";
+        final Map<String, String> map = new HashMap<>();
+        map.put(key, value);
+        final StringLookup mapStringLookup = StringLookupFactory.INSTANCE.functionStringLookup(map::get);
+        final Map<String, StringLookup> stringLookupMap = new HashMap<>();
+        stringLookupMap.put("customLookup", mapStringLookup);
+        final StringSubstitutor strSubst = new StringSubstitutor(
+            StringLookupFactory.INSTANCE.interpolatorStringLookup(stringLookupMap, null, addDefaultLookups));
+        if (addDefaultLookups) {
+            final String spKey = "user.name";
+            Assertions.assertEquals(System.getProperty(spKey), strSubst.replace("${sys:" + spKey + "}"));
+        }
+        Assertions.assertEquals("value", strSubst.replace("${customLookup:key}"));
+    }
+
+    @Test
+    public void testCustomFunctionWithoutDefaults() {
+        testCustomFunctionWithDefaults(false);
+    }
+
+    @Test
     public void testCustomMapWithDefaults() {
         testCustomMapWithDefaults(true);
     }
@@ -51,6 +78,7 @@ public class StringSubstitutorWithInterpolatorStringLookupTest {
             Assertions.assertEquals(System.getProperty(spKey), strSubst.replace("${sys:" + spKey + "}"));
         }
         Assertions.assertEquals("value", strSubst.replace("${customLookup:key}"));
+        Assertions.assertEquals("${UnknownLookup:key}", strSubst.replace("${UnknownLookup:key}"));
     }
 
     @Test
@@ -153,7 +181,7 @@ public class StringSubstitutorWithInterpolatorStringLookupTest {
     }
 
     @Test
-    void testJavaScript() {
+    public void testJavaScript() {
         Assertions.assertEquals("Hello World!",
                 StringSubstitutor.createInterpolator().replace("${script:javascript:\"Hello World!\"}"));
         Assertions.assertEquals("7",

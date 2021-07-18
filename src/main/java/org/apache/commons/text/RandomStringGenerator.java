@@ -16,14 +16,16 @@
  */
 package org.apache.commons.text;
 
-import org.apache.commons.lang3.Validate;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 /**
  * <p>
@@ -163,7 +165,7 @@ public final class RandomStringGenerator {
      */
     public String generate(final int length) {
         if (length == 0) {
-            return "";
+            return StringUtils.EMPTY;
         }
         Validate.isTrue(length > 0, "Length %d is smaller than zero.", length);
 
@@ -171,7 +173,7 @@ public final class RandomStringGenerator {
         long remaining = length;
 
         do {
-            int codePoint;
+            final int codePoint;
             if (characterList != null && !characterList.isEmpty()) {
                 codePoint = generateRandomNumber(characterList);
             } else {
@@ -229,7 +231,7 @@ public final class RandomStringGenerator {
 
     /**
      * <p>A builder for generating {@code RandomStringGenerator} instances.</p>
-     * <p>The behaviour of a generator is controlled by properties set by this
+     * <p>The behavior of a generator is controlled by properties set by this
      * builder. Each property has a default value, which can be overridden by
      * calling the methods defined in this class, prior to calling {@link #build()}.</p>
      *
@@ -367,7 +369,7 @@ public final class RandomStringGenerator {
          *
          * <p>
          * Passing {@code null} or an empty array to this method will revert to the
-         * default behaviour of allowing any character. Multiple calls to this
+         * default behavior of allowing any character. Multiple calls to this
          * method will replace the previously stored predicates.
          * </p>
          *
@@ -376,7 +378,7 @@ public final class RandomStringGenerator {
          * @return {@code this}, to allow method chaining
          */
         public Builder filteredBy(final CharacterPredicate... predicates) {
-            if (predicates == null || predicates.length == 0) {
+            if (ArrayUtils.isEmpty(predicates)) {
                 inclusivePredicates = null;
                 return this;
             }
@@ -436,7 +438,7 @@ public final class RandomStringGenerator {
          *
          * <p>
          * Passing {@code null} or an empty array to this method will revert to the
-         * default behaviour of allowing any character. Multiple calls to this
+         * default behavior of allowing any character. Multiple calls to this
          * method will replace the previously stored Character.
          * </p>
          *

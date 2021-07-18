@@ -107,7 +107,6 @@ public abstract class StrLookup<V> implements StringLookup {
      * Constructor.
      */
     protected StrLookup() {
-        super();
     }
 
     // -----------------------------------------------------------------------
@@ -199,12 +198,11 @@ public abstract class StrLookup<V> implements StringLookup {
          */
         @Override
         public String lookup(final String key) {
-            if (key.length() > 0) {
+            if (!key.isEmpty()) {
                 try {
                     return System.getProperty(key);
                 } catch (final SecurityException scex) {
                     // Squelched. All lookup(String) will return null.
-                    return null;
                 }
             }
             return null;

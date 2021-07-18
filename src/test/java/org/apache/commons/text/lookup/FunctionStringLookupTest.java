@@ -20,23 +20,29 @@ package org.apache.commons.text.lookup;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link MapStringLookup}.
+ * Tests {@link FunctionStringLookup}.
  */
-public class MapStringLookupTest {
+public class FunctionStringLookupTest {
 
     @Test
     public void testConcurrentHashMapNull() {
-        Assertions.assertNull(MapStringLookup.on(new ConcurrentHashMap<String, Object>()).lookup(null));
+        Assertions.assertNull(FunctionStringLookup.on(new ConcurrentHashMap<>()).lookup(null));
     }
 
     @Test
     public void testHashMapNull() {
-        Assertions.assertNull(MapStringLookup.on(new HashMap<String, Object>()).lookup(null));
+        Assertions.assertNull(FunctionStringLookup.on(new HashMap<>()).lookup(null));
+    }
+
+    @Test
+    public void testNullFunction() {
+        Assertions.assertNull(FunctionStringLookup.on((Function<String, Object>) null).lookup(null));
     }
 
     @Test
@@ -45,7 +51,13 @@ public class MapStringLookupTest {
         final String value = "value";
         final Map<String, String> map = new HashMap<>();
         map.put(key, value);
-        Assertions.assertEquals(value, MapStringLookup.on(map).lookup(key));
+        Assertions.assertEquals(value, FunctionStringLookup.on(map).lookup(key));
+    }
+
+    @Test
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(FunctionStringLookup.on(new HashMap<>()).toString().isEmpty());
     }
 
 }

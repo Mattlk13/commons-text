@@ -16,14 +16,14 @@
  */
 package org.apache.commons.text;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 /**
  * <p>
@@ -48,7 +48,6 @@ public class WordUtils {
      * instance to operate.</p>
      */
     public WordUtils() {
-      super();
     }
 
     // Wrapping
@@ -309,7 +308,7 @@ public class WordUtils {
                     Math.min((int) Math.min(Integer.MAX_VALUE, offset + wrapLength + 1L), inputLineLength)));
             if (matcher.find()) {
                 if (matcher.start() == 0) {
-                    matcherSize = matcher.end() - matcher.start();
+                    matcherSize = matcher.end();
                     if (matcherSize != 0) {
                         offset += matcher.end();
                         continue;
@@ -418,7 +417,7 @@ public class WordUtils {
      *
      * <p>The delimiters represent a set of characters understood to separate words.
      * The first string character and the first non-delimiter character after a
-     * delimiter will be capitalized. </p>
+     * delimiter will be capitalized.</p>
      *
      * <p>A {@code null} input String returns {@code null}.
      * Capitalization uses the Unicode title case, normally equivalent to
@@ -473,7 +472,7 @@ public class WordUtils {
     /**
      * <p>Converts all the whitespace separated words in a String into capitalized words,
      * that is each word is made up of a titlecase character and then a series of
-     * lowercase characters.  </p>
+     * lowercase characters.</p>
      *
      * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
      * A {@code null} input String returns {@code null}.
@@ -496,11 +495,11 @@ public class WordUtils {
     /**
      * <p>Converts all the delimiter separated words in a String into capitalized words,
      * that is each word is made up of a titlecase character and then a series of
-     * lowercase characters. </p>
+     * lowercase characters.</p>
      *
      * <p>The delimiters represent a set of characters understood to separate words.
      * The first string character and the first non-delimiter character after a
-     * delimiter will be capitalized. </p>
+     * delimiter will be capitalized.</p>
      *
      * <p>A {@code null} input String returns {@code null}.
      * Capitalization uses the Unicode title case, normally equivalent to
@@ -554,7 +553,7 @@ public class WordUtils {
      *
      * <p>The delimiters represent a set of characters understood to separate words.
      * The first string character and the first non-delimiter character after a
-     * delimiter will be uncapitalized. </p>
+     * delimiter will be uncapitalized.</p>
      *
      * <p>Whitespace is defined by {@link Character#isWhitespace(char)}.
      * A {@code null} input String returns {@code null}.</p>
@@ -712,7 +711,7 @@ public class WordUtils {
             return str;
         }
         if (delimiters != null && delimiters.length == 0) {
-            return "";
+            return StringUtils.EMPTY;
         }
         final Set<Integer> delimiterSet = generateDelimiterSet(delimiters);
         final int strLen = str.length();
@@ -828,7 +827,7 @@ public class WordUtils {
      *
      * @param str         the string to be abbreviated. If null is passed, null is returned.
      *                    If the empty String is passed, the empty string is returned.
-     * @param lower       the lower limit.
+     * @param lower       the lower limit; negative value is treated as zero.
      * @param upper       the upper limit; specify -1 if no limit is desired.
      *                    If the upper limit is lower than the lower limit, it will be
      *                    adjusted to be the same as the lower limit.
@@ -859,7 +858,6 @@ public class WordUtils {
     public static String abbreviate(final String str, int lower, int upper, final String appendToEnd) {
         Validate.isTrue(upper >= -1, "upper value cannot be less than -1");
         Validate.isTrue(upper >= lower || upper == -1, "upper value is less than lower value");
-
         if (StringUtils.isEmpty(str)) {
             return str;
         }

@@ -41,7 +41,7 @@ import org.apache.commons.text.StringSubstitutor;
  * StringSubstitutor.createInterpolator().replace("... ${date:yyyy-MM-dd} ..."));
  * </pre>
  * <p>
- * The above examples convert {@code "yyyy-MM-dd"} to todays's date, for example, {@code "2019-08-04"}.
+ * The above examples convert {@code "yyyy-MM-dd"} to today's date, for example, {@code "2019-08-04"}.
  * </p>
  */
 final class DateStringLookup extends AbstractStringLookup {
@@ -61,11 +61,11 @@ final class DateStringLookup extends AbstractStringLookup {
     /**
      * Formats the given {@code date} long with the given {@code format}.
      *
-     * @param date   the date to format
+     * @param dateMillis the date to format
      * @param format the format string for {@link SimpleDateFormat}.
      * @return The formatted date
      */
-    private String formatDate(final long date, final String format) {
+    private String formatDate(final long dateMillis, final String format) {
         FastDateFormat dateFormat = null;
         if (format != null) {
             try {
@@ -77,7 +77,7 @@ final class DateStringLookup extends AbstractStringLookup {
         if (dateFormat == null) {
             dateFormat = FastDateFormat.getInstance();
         }
-        return dateFormat.format(new Date(date));
+        return dateFormat.format(new Date(dateMillis));
     }
 
     /**

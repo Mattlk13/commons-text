@@ -16,11 +16,11 @@
  */
 package org.apache.commons.text.similarity;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link LongestCommonSubsequenceDistance}.
@@ -35,7 +35,7 @@ public class LongestCommonSubsequenceDistanceTest {
     }
 
     @Test
-    public void testGettingLogestCommonSubsequenceDistacne() {
+    public void testGettingLongestCommonSubsequenceDistance() {
         assertThat(subject.apply("", "")).isEqualTo(0);
         assertThat(subject.apply("left", "")).isEqualTo(4);
         assertThat(subject.apply("", "right")).isEqualTo(5);

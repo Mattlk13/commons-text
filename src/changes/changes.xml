@@ -44,20 +44,95 @@ The <action> type attribute can be add,update,fix,remove.
     <title>Apache Commons Text Changes</title>
   </properties>
   <body>
-
-  <release version="1.8.1" date="2019-MM-DD" description="Release 1.8.1">
-    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[test] junit-jupiter 5.5.1 -> 5.5.2.</action>
+  <release version="1.10.0" date="202Y-MM-DD" description="Release 1.10.0. Requires Java 8.">
+    <!-- FIX -->
+    <action issue="TEXT-189" type="fix" dev="kinow" due-to="Gongpu Zhu">Fix CaseUtils when the input string contains only delimiters</action>
+    <action issue="TEXT-187" type="fix" dev="kinow">Add GraalVM test dependencies to fix test failures with Java 15.</action>
+    <action issue="TEXT-158" type="fix" dev="kinow">Incorrect values for Jaccard similarity with empty strings.</action>
+    <action issue="TEXT-186" type="fix" dev="ggregory" due-to="Gautam Korlam, Gary Gregory">StringSubstitutor map constructor throws NPE on 1.9 with null map.</action>
+    <action issue="TEXT-191" type="fix" dev="kinow" due-to="Bradley David Rumball">JaroWinklerDistance returns the same values as JaroWinklerSimilarity.</action>
+    <!-- ADD -->
+    <action issue="TEXT-207" type="add" dev="mattjuntunen">Add DoubleFormat utility.</action>
+    <action issue="TEXT-190" type="add" dev="kinow" due-to="Benjamin Bing">Document negative limit for WordUtils abbreviate method</action>
+    <action issue="TEXT-188" type="add" dev="kinow" due-to="Jakob Vesterstrøm">Speed up LevenshteinDistance with threshold by exiting early</action>
+    <action issue="TEXT-185" type="add" dev="ggregory" due-to="Larry West, Gary Gregory">Release Notes page hasn't been updated for 1.9 release yet.</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add StrBuilder.isNotEmpty().</action>
+    <!-- UPDATE -->
+    <action                  type="update" dev="ggregory" due-to="Dependabot">Update checkstyle from 8.34 to 8.44, #141, #168, #182, #188, #193, #201 #208 #211 #228 #235 #245.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump spotbugs-maven-plugin from 4.0.0 to 4.3.0, #144, #150, #167, #176, #194, #210, #223, #250.</action>
+    <action                  type="update" dev="ggregory" due-to="Dependabot">Update mockito-inline from 3.4.4 to 3.11.2, #143 #148 #149 #152 #153 #154 #158 #159 #166 #177 #180 #187 #195 #197 #207 #216 #231 #236 #237 #243.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump junit-jupiter from 5.6.2 to 5.7.2 #163 #204 #232.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump assertj-core from 3.16.1 to 3.20.2 #151 #157 #160 #178 #184 #199 #244.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot, Gary Gregory">Bump commons-io from 2.7 to 2.11.0 #161 #251.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump actions/setup-java from v1.4.0 to v1.4.3 #147 #156 #155 #172 #215.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump commons-parent from 51 to 52 #145.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump actions/checkout from v1 to v2.3.4 #138 #146 #165 #183.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump maven-pmd-plugin from 3.13.0 to 3.14.0 #186.</action>
+    <action                  type="update" dev="ggregory" due-to="Dependabot">Bump graalvm.version from 20.2.0 to 21.1.0 #185 #198 #206 #227.</action>
+    <action                  type="update" dev="ggregory" due-to="Arturo Bernal">Minor Improvements #192.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">Update commons.japicmp.version 0.14.3 -> 0.15.3.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">Update commons.jacoco.version 0.8.5 to 0.8.6; fixes Java 15 build.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">Update spotbugs from 4.1.3 to 4.3.0 #175, 189, #209 #218 #247.</action>
+    <action                  type="update" dev="ggregory" due-to="Arturo Bernal">Minor Improvements #196..</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump maven-checkstyle-plugin from 3.1.1 to 3.1.2 #202.</action>
+    <action                  type="update" dev="kinow" due-to="Dependabot">Bump actions/cache from v2 to v2.1.6 #205 #217 #234.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">Update commons-lang3 3.11 -> 3.12.0.</action>
+    <action issue="TEXT-194" type="update" dev="kinow" due-to="Arturo Bernal">Use StringUtils.INDEX_NOT_FOUND constant.</action>
+    <action issue="TEXT-199" type="update" dev="kinow" due-to="Arturo Bernal">Remove redundant local variable.</action>
+    <action issue="TEXT-198" type="update" dev="kinow" due-to="Arturo Bernal">Replace lambda with method reference.</action>
+    <action issue="TEXT-200" type="update" dev="kinow" due-to="Arturo Bernal">Simplify statements.</action>
+    <action issue="TEXT-197" type="update" dev="kinow" due-to="Arturo Bernal">Replace statement lambda with expression lambda.</action>
+    <action issue="TEXT-204" type="update" dev="kinow" due-to="Arturo Bernal">Use static class inner class in tests.</action>
+    <action issue="TEXT-201" type="update" dev="kinow" due-to="Arturo Bernal">Simplify assertion.</action>
+    <action issue="TEXT-202" type="update" dev="kinow" due-to="Arturo Bernal">Extract duplicate code.</action>
+    <action issue="TEXT-205" type="update" dev="kinow" due-to="Arturo Bernal">Set void return method.</action>
+  </release>
+  <release version="1.9" date="2020-07-21" description="Release 1.9. Requires Java 8.">
     <action issue="TEXT-166" type="fix" dev="kinow" due-to="Mikko Maunu">Removed non-existing parameter from Javadocs and spelled out parameters in throws.</action>
     <action issue="TEXT-149" type="fix" dev="kinow" due-to="Yuji Konishi">StringEscapeUtils.unescapeCsv doesn't remove quotes at begin and end of string.</action>
+    <action issue="TEXT-174" type="fix" dev="ggregory" due-to="furkilic">ScriptStringLookup does not accept ":" #126.</action>
+    <action issue="TEXT-178" type="fix" dev="ggregory" due-to="Gary Gregory">StringSubstitutor incorrectly removes some escape characters.</action>
+    <action issue="TEXT-181" type="fix" dev="ggregory" due-to="XenoAmess">Fix Javadocs #135.</action>
+    <action issue="TEXT-182" type="fix" dev="ggregory" due-to="XenoAmess">Fix typos #137.</action>
+    <action issue="TEXT-183" type="fix" dev="ggregory" due-to="XenoAmess">Make ConstantStringLookup.constantCache final #136.</action>
+    <action issue="TEXT-184" type="fix" dev="ggregory" due-to="XenoAmess">Simplify if in CaseUtils #134.</action>
     <action                  type="update" dev="ggregory" due-to="Johan Hammar">[javadoc] Fix compiler warnings in Java code example in Javadoc #124.</action>
-    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[test] org.assertj:assertj-core 3.13.2 -> 3.14.0.</action>
-    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] com.puppycrawl.tools:checkstyle 8.23 -> 8.24.</action>
-    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] com.puppycrawl.tools:checkstyle 8.25 -> 8.26.</action>
-    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] com.puppycrawl.tools:checkstyle 8.26 -> 8.27.</action>
-    <action issue="TEXT-174" type="fix"    dev="ggregory" due-to="furkilic">ScriptStringLookup does not accept ":" #126.</action>
+    <action issue="TEXT-177" type="update" dev="ggregory" due-to="Gary Gregory">Update from Apache Commons Lang 3.9 to 3.11.</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add StringMatcher.size().</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Refactor TextStringBuilder.readFrom(Readable), extracting readFrom(CharBuffer) and readFrom(Reader).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add BiStringLookup and implementation BiFunctionStringLookup.</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.StringSubstitutor.StringSubstitutor(StringSubstitutor).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.TextStringBuilder(CharSequence).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.drainChar(int).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.drainChars(int, int, char[]. int).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.isNotEmpty().</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.isReallocated().</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.readFrom(Reader, int).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.set(String).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.wrap(char[]).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.TextStringBuilder.wrap(char[], int).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.io.StringSubstitutorReader.</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.lookup.StringLookupFactory.functionStringLookup(Function&lt;String, V&gt;).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.matcher.StringMatcher.isMatch(CharSequence, int).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.matcher.StringMatcher.isMatch(CharSequence, int, int, int).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.matcher.StringMatcherFactory.andMatcher(StringMatcher...).</action>
+    <action                  type="add" dev="ggregory" due-to="Gary Gregory">Add org.apache.commons.text.matcher.StringMatcherFactory.stringMatcher(char...).</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] Skip clirr since we use JApiCmp.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[test] junit-jupiter 5.5.1 -> 5.5.2.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[test] org.assertj:assertj-core 3.13.2 -> 3.16.1.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] com.puppycrawl.tools:checkstyle 8.23 -> 8.34.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] Update JUnit from 5.5.2 to 5.6.2.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] commons.jacoco.version 0.8.4 -> 0.8.5.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] commons.javadoc.version 3.1.1 -> 3.2.0.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] commons.japicmp.version 0.14.1 -> 0.14.3.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] checkstyle.plugin.version 3.1.0 -> 3.1.1.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] checkstyle.version 8.27 -> 8.33.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] org.apache.commons:commons-parent 48 -> 51.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] maven-pmd-plugin 3.12.0 -> 3.13.0.</action>
+    <action                  type="update" dev="ggregory" due-to="Gary Gregory">[build] org.mockito 3.3.3 -> 3.4.4.</action>
   </release>
-  
-  <release version="1.8" date="2019-08-30" description="Release 1.8">
+
+  <release version="1.8" date="2019-08-30" description="Release 1.8. Requires Java 8.">
     <action issue="TEXT-167" type="fix" dev="ggregory" due-to="Larry West">commons-text web page missing "RELEASE-NOTES-1.7.txt"</action>
     <action issue="TEXT-168" type="fix" dev="ggregory" due-to="luksan47">(doc) Fixed wrong value for Jaro-Winkler example #117</action>
     <action issue="TEXT-169" type="add" dev="ggregory" due-to="Gary Gregory">Add helper factory method org.apache.commons.text.StringSubstitutor.createInterpolator().</action>
@@ -66,8 +141,8 @@ The <action> type attribute can be add,update,fix,remove.
     <action                  type="update" dev="ggregory" due-to="Gary Gregory">Expand Javadoc for StringSubstitutor and friends.</action>
     <action                  type="update" dev="ggregory" due-to="Gary Gregory">[site] checkstyle.version 8.21 -> 8.23.</action>
   </release>
-  
-  <release version="1.7" date="2019-06-30" description="Release 1.7">
+
+  <release version="1.7" date="2019-06-30" description="Release 1.7. Requires Java 8.">
     <action issue="TEXT-111" type="fix" dev="kinow" due-to="@CAPS50">WordUtils.wrap must calculate offset increment from wrapOn pattern length</action>
     <action issue="TEXT-104" type="update" dev="kinow" due-to="Sascha Szott">Jaro Winkler Distance refers to similarity</action>
     <action issue="TEXT-148" type="add" dev="ggregory">Add an enum to the lookup package that lists all StringLookups</action>
@@ -85,14 +160,14 @@ The <action> type attribute can be add,update,fix,remove.
     <action                  type="update" dev="ggregory">Update site from com.puppycrawl.tools:checkstyle 8.18 to 8.21.</action>
   </release>
 
-  <release version="1.6" date="2018-10-12" description="Release 1.6">
+  <release version="1.6" date="2018-10-12" description="Release 1.6. Requires Java 8.">
     <action issue="TEXT-144" type="update" dev="ggregory">Add the resource string bundle string lookup to the default set of lookups</action>
     <action issue="TEXT-145" type="update" dev="ggregory">Add StringLookupFactory methods for the URL encoder and decoder string lookups</action>
     <action issue="TEXT-146" type="update" dev="ggregory">org.apache.commons.text.lookup.StringLookupFactory.interpolatorStringLookup() should reuse a singleton instance</action>
     <action issue="TEXT-147" type="update" dev="ggregory">Add a Base64 encoder string lookup.</action>
   </release>
 
-  <release version="1.5" date="2018-09-29" description="Release 1.5">
+  <release version="1.5" date="2018-09-29" description="Release 1.5. Requires Java 8.">
     <action issue="TEXT-139" type="fix" dev="chtompki" due-to="Nick Wong">Improve JaccardSimilarity computational cost</action>
     <action issue="TEXT-118" type="fix" dev="chtompki" due-to="Nandor Kollar">JSON escaping incorrect for the delete control character</action>
     <action issue="TEXT-130" type="fix" dev="chtompki" due-to="Jan Martin Keil">Fixes JaroWinklerDistance: Wrong results due to precision of transpositions</action>
@@ -109,15 +184,15 @@ The <action> type attribute can be add,update,fix,remove.
     <action issue="TEXT-143" type="add" dev="ggregory">Add constant string lookup like the one in Apache Commons Configuration.</action>
   </release>
 
-  <release version="1.4" date="2018-06-12" description="Release 1.4">
+  <release version="1.4" date="2018-06-12" description="Release 1.4. Requires Java 8.">
     <action issue="TEXT-120" type="fix" dev="pschumacher">StringEscapeUtils#unescapeJson does not unescape double quotes and forward slash</action>
     <action issue="TEXT-119" type="fix" dev="pschumacher">Remove mention of SQL escaping from user guide</action>
     <action issue="TEXT-121" type="update" dev="ggregory" due-to="pschumacher">Update Java requirement from version 7 to 8.</action>
-    <action issue="TEXT-122" type="update" dev="ggregory">Allow full customization with new API org.apache.commons.text.lookup.StringLookupFactory.interpolatorStringLookup(Map&lt;String, StringLookup>, StringLookup, boolean).</action>    
-    <action issue="TEXT-123" type="fix" dev="ggregory" due-to="Takanobu Asanuma">WordUtils.wrap throws StringIndexOutOfBoundsException when wrapLength is Integer.MAX_VALUE.</action>   
+    <action issue="TEXT-122" type="update" dev="ggregory">Allow full customization with new API org.apache.commons.text.lookup.StringLookupFactory.interpolatorStringLookup(Map&lt;String, StringLookup>, StringLookup, boolean).</action>
+    <action issue="TEXT-123" type="fix" dev="ggregory" due-to="Takanobu Asanuma">WordUtils.wrap throws StringIndexOutOfBoundsException when wrapLength is Integer.MAX_VALUE.</action>
   </release>
 
-  <release version="1.3" date="2018-03-16" description="Release 1.3">
+  <release version="1.3" date="2018-03-16" description="Release 1.3. Requires Java 7.">
     <action issue="TEXT-110" type="add" dev="pschumacher">Add Automatic-Module-Name MANIFEST entry for Java 9 compatibility</action>
     <action issue="TEXT-70" type="fix" dev="pschumacher">Build failure with java 9-ea+159</action>
     <action issue="TEXT-113" type="add" dev="ggregory">Add an interpolator string lookup: StringLookupFactory#interpolatorStringLookup()</action>
@@ -128,7 +203,7 @@ The <action> type attribute can be add,update,fix,remove.
     <action issue="TEXT-80" type="fix" dev="ggregory">StrLookup API confusing</action>
   </release>
 
-  <release version="1.2" date="2017-12-12" description="Release 1.2">
+  <release version="1.2" date="2017-12-12" description="Release 1.2. Requires Java 7.">
     <action issue="TEXT-107" type="update" dev="chtompki">Upversion commons-lang to 3.7</action>
     <action issue="TEXT-106" type="fix" dev="kinow" due-to="Benoit Moreau">Exception thrown in ExtendedMessageFormat using quotes with custom registry</action>
     <action issue="TEXT-100" type="fix" dev="kinow" due-to="Don Jeba">StringEscapeUtils#UnEscapeJson doesn't recognize escape signs correctly</action>
@@ -149,7 +224,7 @@ The <action> type attribute can be add,update,fix,remove.
     <action issue="TEXT-105" type="fix" dev="pschumacher" due-to="Abrasha">Typo in LongestCommonSubsequence#logestCommonSubsequence</action>
   </release>
 
-  <release version="1.1" date="2017-05-23" description="Release 1.1">
+  <release version="1.1" date="2017-05-23" description="Release 1.1. Requires Java 7.">
     <action issue="TEXT-39" type="update" dev="chtompki" due-to="Amey Jadiye">WordUtils should use toXxxxCase(int) rather than toXxxxCase(char)</action>
     <action issue="TEXT-41" type="add" dev="chtompki" due-to="Amey Jadiye">WordUtils.abbreviate support</action>
     <action issue="TEXT-82" type="add" dev="chtompki" due-to="Amey Jadiye">Putting WordUtils back in to the codebase</action>
@@ -159,7 +234,7 @@ The <action> type attribute can be add,update,fix,remove.
     <action issue="TEXT-72" type="fix" dev="chtompki">Similar to LANG-1025, clirr fails site build.</action>
   </release>
 
-  <release version="1.0" date="2017-03-04" description="
+  <release version="1.0" date="2017-03-04" description="Requires Java 7.
 
    Incompatible changes
    ====================
@@ -176,7 +251,7 @@ The <action> type attribute can be add,update,fix,remove.
     <action issue="TEXT-63" type="fix" dev="sebb">Mutable fields should be private</action>
   </release>
 
-  <release version="1.0-beta-1" date="2017-01-30" description="First release (beta) of Commons Text">
+  <release version="1.0-beta-1" date="2017-01-30" description="First release (beta) of Commons Text. Requires Java 7.">
     <action issue="TEXT-62" type="fix" dev="chtompki">Incorporate suggestions from RC2 into 1.0 release</action>
     <action issue="TEXT-61" type="update" dev="chtompki" due-to="Lee Adcock">Naming packages org.apache.commons.text.beta</action>
     <action issue="TEXT-60" type="fix" dev="chtompki" due-to="Lee Adcock">Upgrading Jacoco for Java 9-ea compatibility.</action>

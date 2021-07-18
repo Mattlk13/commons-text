@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -33,7 +34,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 public class ReplacementsFinderTest {
 
-    private SimpleHandler handler = null;
+    private SimpleHandler handler;
 
     @BeforeEach
     public void setUp() {
@@ -41,53 +42,49 @@ public class ReplacementsFinderTest {
     }
 
     public static Stream<Arguments> parameters() {
-        return Stream.of(
-            Arguments.of(
-                "branco",
-                "blanco",
-                1,
-                new Character[] {'r'},
-                new Character[] {'l'}),
-            Arguments.of(
-                "test the blocks before you use it",
-                "try the blocks before you put it",
-                25,
-                new Character[] {'e', 's', 't', 's', 'e'},
-                new Character[] {'r', 'y', 'p', 't'}
-            ));
+        return Stream.of(Arguments.of("branco", "blanco", 1, new Character[] {'r'}, new Character[] {'l'}),
+            Arguments.of("test the blocks before you use it", "try the blocks before you put it", 25,
+                new Character[] {'e', 's', 't', 's', 'e'}, new Character[] {'r', 'y', 'p', 't'}));
     }
 
     @ParameterizedTest
     @MethodSource("parameters")
     public void testReplacementsHandler(final String left, final String right, final int skipped,
-            final Character[] from, final Character[] to) {
+        final Character[] from, final Character[] to) {
         final StringsComparator sc = new StringsComparator(left, right);
         final ReplacementsFinder<Character> replacementFinder = new ReplacementsFinder<>(handler);
         sc.getScript().visit(replacementFinder);
         assertThat(handler.getSkipped()).as("Skipped characters do not match").isEqualTo(skipped);
-        assertArrayEquals(handler.getFrom().toArray(new Character[0]), from, "From characters do not match");
-        assertArrayEquals(to, handler.getTo().toArray(new Character[0]), "To characters do not match");
+        assertArrayEquals(handler.getFrom().toArray(ArrayUtils.EMPTY_CHARACTER_OBJECT_ARRAY), from,
+            "From characters do not match");
+        assertArrayEquals(to, handler.getTo().toArray(ArrayUtils.EMPTY_CHARACTER_OBJECT_ARRAY),
+            "To characters do not match");
     }
 
-    // Helper RecplacementsHandler implementation for testing
-    private class SimpleHandler implements ReplacementsHandler<Character> {
+    // Helper ReplacementsHandler implementation for testing
+    private static class SimpleHandler implements ReplacementsHandler<Character> {
         private int skipped;
         private final List<Character> from;
         private final List<Character> to;
+
         SimpleHandler() {
             skipped = 0;
             from = new ArrayList<>();
             to = new ArrayList<>();
         }
+
         public int getSkipped() {
             return skipped;
         }
+
         public List<Character> getFrom() {
             return from;
         }
+
         public List<Character> getTo() {
             return to;
         }
+
         @Override
         public void handleReplacement(final int skipped, final List<Character> from, final List<Character> to) {
             this.skipped += skipped;

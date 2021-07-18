@@ -31,9 +31,7 @@ public class JavaPlatformStringLookupTest {
 
     @Test
     public void testBadKey() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            JavaPlatformStringLookup.INSTANCE.lookup("BADKEY");
-        });
+        assertThrows(IllegalArgumentException.class, () -> JavaPlatformStringLookup.INSTANCE.lookup("BADKEY"));
     }
 
     @Test
@@ -44,6 +42,12 @@ public class JavaPlatformStringLookupTest {
     @Test
     public void testNull() {
         Assertions.assertNull(JavaPlatformStringLookup.INSTANCE.lookup(null));
+    }
+
+    @Test
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(JavaPlatformStringLookup.INSTANCE.toString().isEmpty());
     }
 
     @Test

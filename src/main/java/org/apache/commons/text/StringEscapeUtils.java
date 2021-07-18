@@ -16,6 +16,12 @@
  */
 package org.apache.commons.text;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.translate.AggregateTranslator;
 import org.apache.commons.text.translate.CharSequenceTranslator;
@@ -29,18 +35,14 @@ import org.apache.commons.text.translate.OctalUnescaper;
 import org.apache.commons.text.translate.UnicodeUnescaper;
 import org.apache.commons.text.translate.UnicodeUnpairedSurrogateRemover;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * <p>Escapes and unescapes {@code String}s for
- * Java, Java Script, HTML and XML.</p>
+ * <p>
+ * Escapes and unescapes {@code String}s for Java, Java Script, HTML and XML.
+ * </p>
  *
- * <p>#ThreadSafe#</p>
- *
+ * <p>
+ * #ThreadSafe#
+ * </p>
  *
  * <p>
  * This code has been adapted from Apache Commons Lang 3.5.
@@ -248,8 +250,8 @@ public class StringEscapeUtils {
         escapeXsiMap.put("'", "\\'");
         escapeXsiMap.put(" ", "\\ ");
         escapeXsiMap.put("\t", "\\\t");
-        escapeXsiMap.put("\r\n", "");
-        escapeXsiMap.put("\n", "");
+        escapeXsiMap.put("\r\n", StringUtils.EMPTY);
+        escapeXsiMap.put("\n", StringUtils.EMPTY);
         escapeXsiMap.put("*", "\\*");
         escapeXsiMap.put("?", "\\?");
         escapeXsiMap.put("[", "\\[");
@@ -277,7 +279,7 @@ public class StringEscapeUtils {
         unescapeJavaMap.put("\\\\", "\\");
         unescapeJavaMap.put("\\\"", "\"");
         unescapeJavaMap.put("\\'", "'");
-        unescapeJavaMap.put("\\", "");
+        unescapeJavaMap.put("\\", StringUtils.EMPTY);
         UNESCAPE_JAVA = new AggregateTranslator(
                 new OctalUnescaper(),     // .between('\1', '\377'),
                 new UnicodeUnescaper(),
@@ -376,7 +378,7 @@ public class StringEscapeUtils {
         private static final char BACKSLASH = '\\';
 
         @Override
-        public int translate(final CharSequence input, final int index, final Writer out) throws IOException {
+        public int translate(final CharSequence input, final int index, final Writer writer) throws IOException {
 
             if (index != 0) {
                 throw new IllegalStateException("XsiUnescaper should never reach the [1] index");
@@ -390,12 +392,12 @@ public class StringEscapeUtils {
                 final int pos = s.indexOf(BACKSLASH, searchOffset);
                 if (pos == -1) {
                     if (segmentStart < s.length()) {
-                        out.write(s.substring(segmentStart));
+                        writer.write(s.substring(segmentStart));
                     }
                     break;
                 }
                 if (pos > segmentStart) {
-                    out.write(s.substring(segmentStart, pos));
+                    writer.write(s.substring(segmentStart, pos));
                 }
                 segmentStart = pos + 1;
                 searchOffset = pos + 2;
@@ -418,7 +420,6 @@ public class StringEscapeUtils {
      * instance to operate.</p>
      */
     public StringEscapeUtils() {
-        super();
     }
 
     /**
@@ -537,7 +538,7 @@ public class StringEscapeUtils {
      * <p>The only difference between Java strings and EcmaScript strings
      * is that in EcmaScript, a single quote and forward-slash (/) are escaped.</p>
      *
-     * <p>Note that EcmaScript is best known by the JavaScript and ActionScript dialects. </p>
+     * <p>Note that EcmaScript is best known by the JavaScript and ActionScript dialects.</p>
      *
      * <p>Example:</p>
      * <pre>
@@ -570,7 +571,7 @@ public class StringEscapeUtils {
      * <p>The only difference between Java strings and Json strings
      * is that in Json, forward-slash (/) is escaped.</p>
      *
-     * <p>See http://www.ietf.org/rfc/rfc4627.txt for further details. </p>
+     * <p>See http://www.ietf.org/rfc/rfc4627.txt for further details.</p>
      *
      * <p>Example:</p>
      * <pre>
@@ -644,7 +645,7 @@ public class StringEscapeUtils {
      *
      * <p>Supports all known HTML 4.0 entities, including funky accents.
      * Note that the commonly used apostrophe escape character (&amp;apos;)
-     * is not a legal entity and so is not supported). </p>
+     * is not a legal entity and so is not supported).</p>
      *
      * @param input  the {@code String} to escape, may be null
      * @return a new escaped {@code String}, {@code null} if null string input
@@ -661,7 +662,7 @@ public class StringEscapeUtils {
 
     /**
      * <p>Escapes the characters in a {@code String} using HTML entities.</p>
-     * <p>Supports only the HTML 3.0 entities. </p>
+     * <p>Supports only the HTML 3.0 entities.</p>
      *
      * @param input  the {@code String} to escape, may be null
      * @return a new escaped {@code String}, {@code null} if null string input
@@ -772,7 +773,7 @@ public class StringEscapeUtils {
      * Does not support DTDs or external entities.</p>
      *
      * <p>Note that numerical \\u Unicode codes are unescaped to their respective
-     *    Unicode characters. This may change in future releases. </p>
+     *    Unicode characters. This may change in future releases.</p>
      *
      * @param input  the {@code String} to unescape, may be null
      * @return a new unescaped {@code String}, {@code null} if null string input
@@ -809,14 +810,14 @@ public class StringEscapeUtils {
     }
 
     /**
-     * <p>Returns a {@code String} value for an unescaped CSV column. </p>
+     * <p>Returns a {@code String} value for an unescaped CSV column.</p>
      *
      * <p>If the value is enclosed in double quotes, and contains a comma, newline
      *    or double quote, then quotes are removed.
      * </p>
      *
      * <p>Any double quote escaped characters (a pair of double quotes) are unescaped
-     *    to just one double quote. </p>
+     *    to just one double quote.</p>
      *
      * <p>If the value is not enclosed in double quotes, or is and does not contain a
      *    comma, newline or double quote, then the String value is returned unchanged.</p>

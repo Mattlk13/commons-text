@@ -18,6 +18,7 @@ package org.apache.commons.text;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.text.matcher.StringMatcherFactory;
 
 /**
@@ -180,7 +181,7 @@ public abstract class StrMatcher {
      * @return a new matcher for the given char[]
      */
     public static StrMatcher charSetMatcher(final char... chars) {
-        if (chars == null || chars.length == 0) {
+        if (ArrayUtils.isEmpty(chars)) {
             return NONE_MATCHER;
         }
         if (chars.length == 1) {
@@ -196,7 +197,7 @@ public abstract class StrMatcher {
      * @return a new Matcher for the given characters
      */
     public static StrMatcher charSetMatcher(final String chars) {
-        if (chars == null || chars.length() == 0) {
+        if (chars == null || chars.isEmpty()) {
             return NONE_MATCHER;
         }
         if (chars.length() == 1) {
@@ -212,7 +213,7 @@ public abstract class StrMatcher {
      * @return a new Matcher for the given String
      */
     public static StrMatcher stringMatcher(final String str) {
-        if (str == null || str.length() == 0) {
+        if (str == null || str.isEmpty()) {
             return NONE_MATCHER;
         }
         return new StringMatcher(str);
@@ -223,7 +224,6 @@ public abstract class StrMatcher {
      * Constructor.
      */
     protected StrMatcher() {
-        super();
     }
 
     /**
@@ -290,13 +290,12 @@ public abstract class StrMatcher {
          * @param chars  the characters to match, must not be null
          */
         CharSetMatcher(final char[] chars) {
-            super();
             this.chars = chars.clone();
             Arrays.sort(this.chars);
         }
 
         /**
-         * Returns whether or not the given character matches.
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
          *
          * @param buffer  the text content to match against, do not change
          * @param pos  the starting position for the match, valid for buffer
@@ -324,12 +323,11 @@ public abstract class StrMatcher {
          * @param ch  the character to match
          */
         CharMatcher(final char ch) {
-            super();
             this.ch = ch;
         }
 
         /**
-         * Returns whether or not the given character matches.
+         * Returns {@code 1} if there is a match, or {@code 0} if there is no match.
          *
          * @param buffer  the text content to match against, do not change
          * @param pos  the starting position for the match, valid for buffer
@@ -357,12 +355,11 @@ public abstract class StrMatcher {
          * @param str  the string to match, must not be null
          */
         StringMatcher(final String str) {
-            super();
             chars = str.toCharArray();
         }
 
         /**
-         * Returns whether or not the given text matches the stored string.
+         * Returns the number of matching characters, or zero if there is no match.
          *
          * @param buffer  the text content to match against, do not change
          * @param pos  the starting position for the match, valid for buffer
@@ -401,11 +398,10 @@ public abstract class StrMatcher {
          * Constructs a new instance of {@code NoMatcher}.
          */
         NoMatcher() {
-            super();
         }
 
         /**
-         * Always returns {@code false}.
+         * Always returns {@code 0}.
          *
          * @param buffer  the text content to match against, do not change
          * @param pos  the starting position for the match, valid for buffer
@@ -429,7 +425,6 @@ public abstract class StrMatcher {
          * Constructs a new instance of {@code TrimMatcher}.
          */
         TrimMatcher() {
-            super();
         }
 
         /**

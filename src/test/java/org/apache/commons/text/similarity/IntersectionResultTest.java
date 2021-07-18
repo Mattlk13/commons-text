@@ -16,11 +16,11 @@
  */
 package org.apache.commons.text.similarity;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link IntersectionResult}.
@@ -39,9 +39,7 @@ public class IntersectionResultTest {
         final int sizeA = -1;
         final int sizeB = 0;
         final int intersection = 0;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new IntersectionResult(sizeA, sizeB, intersection);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new IntersectionResult(sizeA, sizeB, intersection));
     }
 
     @Test
@@ -49,9 +47,7 @@ public class IntersectionResultTest {
         final int sizeA = 0;
         final int sizeB = -1;
         final int intersection = 0;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new IntersectionResult(sizeA, sizeB, intersection);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new IntersectionResult(sizeA, sizeB, intersection));
     }
 
     @Test
@@ -59,9 +55,7 @@ public class IntersectionResultTest {
         final int sizeA = 0;
         final int sizeB = 0;
         final int intersection = -1;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new IntersectionResult(sizeA, sizeB, intersection);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new IntersectionResult(sizeA, sizeB, intersection));
     }
 
     @Test
@@ -69,12 +63,8 @@ public class IntersectionResultTest {
         final int sizeA = 1;
         final int sizeB = 2;
         final int intersection = Math.max(sizeA, sizeB) + 1;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new IntersectionResult(sizeA, sizeB, intersection);
-        });
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new IntersectionResult(sizeB, sizeA, intersection);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new IntersectionResult(sizeA, sizeB, intersection));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new IntersectionResult(sizeB, sizeA, intersection));
     }
 
     @Test
@@ -103,14 +93,14 @@ public class IntersectionResultTest {
         };
 
         // Test a different instance with same values
-        Assertions.assertTrue(results[0].equals(new IntersectionResult(0, 0, 0)));
+        Assertions.assertEquals(results[0], new IntersectionResult(0, 0, 0));
 
         final Object something = new Object();
         for (int i = 0; i < results.length; i++) {
-            Assertions.assertFalse(results[i].equals(something));
-            Assertions.assertFalse(results[i].equals(null));
+            Assertions.assertNotEquals(results[i], something);
+            Assertions.assertNotEquals(null, results[i]);
             for (int j = 0; j < results.length; j++) {
-                Assertions.assertTrue(results[i].equals(results[j]) == (i == j));
+                Assertions.assertEquals(results[i].equals(results[j]), (i == j));
             }
         }
     }

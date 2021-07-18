@@ -58,14 +58,32 @@ public class InterpolatorStringLookupTest {
         final String value = lookup.lookup(key);
         assertNotNull(value);
         assertFalse(value.isEmpty());
-        System.out.println(key + " = " + value);
+        // System.out.println(key + " = " + value);
+    }
+
+    private void check(final StringLookup lookup) {
+        String value = lookup.lookup("sys:" + TESTKEY);
+        assertEquals(TESTVAL, value);
+        value = lookup.lookup("env:PATH");
+        assertNotNull(value);
+        value = lookup.lookup("date:yyyy-MM-dd");
+        assertNotNull(value, "No Date");
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        final String today = format.format(new Date());
+        assertEquals(value, today);
+        assertLookupNotEmpty(lookup, "java:version");
+        assertLookupNotEmpty(lookup, "java:runtime");
+        assertLookupNotEmpty(lookup, "java:vm");
+        assertLookupNotEmpty(lookup, "java:os");
+        assertLookupNotEmpty(lookup, "java:locale");
+        assertLookupNotEmpty(lookup, "java:hardware");
     }
 
     @Test
     public void testLookup() {
         final Map<String, String> map = new HashMap<>();
         map.put(TESTKEY, TESTVAL);
-        final StringLookup lookup = new InterpolatorStringLookup(MapStringLookup.on(map));
+        final StringLookup lookup = new InterpolatorStringLookup(StringLookupFactory.INSTANCE.mapStringLookup(map));
         String value = lookup.lookup(TESTKEY);
         assertEquals(TESTVAL, value);
         value = lookup.lookup("ctx:" + TESTKEY);
@@ -87,26 +105,22 @@ public class InterpolatorStringLookupTest {
 
     @Test
     public void testLookupWithDefaultInterpolator() {
-        final StringLookup lookup = new InterpolatorStringLookup();
-        String value = lookup.lookup("sys:" + TESTKEY);
-        assertEquals(TESTVAL, value);
-        value = lookup.lookup("env:PATH");
-        assertNotNull(value);
-        value = lookup.lookup("date:yyyy-MM-dd");
-        assertNotNull(value, "No Date");
-        final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        final String today = format.format(new Date());
-        assertEquals(value, today);
-        assertLookupNotEmpty(lookup, "java:version");
-        assertLookupNotEmpty(lookup, "java:runtime");
-        assertLookupNotEmpty(lookup, "java:vm");
-        assertLookupNotEmpty(lookup, "java:os");
-        assertLookupNotEmpty(lookup, "java:locale");
-        assertLookupNotEmpty(lookup, "java:hardware");
+        check(new InterpolatorStringLookup());
+    }
+
+    @Test
+    public void testLookupWithNullDefaultInterpolator() {
+        check(new InterpolatorStringLookup((StringLookup) null));
     }
 
     @Test
     public void testNull() {
         Assertions.assertNull(InterpolatorStringLookup.INSTANCE.lookup(null));
+    }
+
+    @Test
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(new InterpolatorStringLookup().toString().isEmpty());
     }
 }

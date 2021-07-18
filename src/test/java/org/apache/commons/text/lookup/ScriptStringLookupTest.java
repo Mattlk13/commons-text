@@ -19,6 +19,8 @@ package org.apache.commons.text.lookup;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import javax.script.ScriptEngineManager;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,25 +29,21 @@ import org.junit.jupiter.api.Test;
  */
 public class ScriptStringLookupTest {
 
+    private static final String JS_NAME = "JavaScript";
+
     @Test
     public void testBadEngineName() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            ScriptStringLookup.INSTANCE.lookup("BAD_ENGINE_NAME:\"Hello World!\"");
-        });
+        assertThrows(IllegalArgumentException.class, () -> ScriptStringLookup.INSTANCE.lookup("BAD_ENGINE_NAME:\"Hello World!\""));
     }
 
     @Test
     public void testBadScript() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            ScriptStringLookup.INSTANCE.lookup("javascript:X");
-        });
+        assertThrows(IllegalArgumentException.class, () -> ScriptStringLookup.INSTANCE.lookup(JS_NAME + ":X"));
     }
 
     @Test
     public void testNoScript() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            ScriptStringLookup.INSTANCE.lookup("ENGINE_NAME:");
-        });
+        assertThrows(IllegalArgumentException.class, () -> ScriptStringLookup.INSTANCE.lookup("ENGINE_NAME:"));
     }
 
     @Test
@@ -55,20 +53,29 @@ public class ScriptStringLookupTest {
 
     @Test
     public void testOne() {
-        Assertions.assertEquals("Hello World!", ScriptStringLookup.INSTANCE.lookup("javascript:\"Hello World!\""));
+        Assertions.assertEquals("Hello World!", ScriptStringLookup.INSTANCE.lookup(JS_NAME + ":\"Hello World!\""));
+    }
+
+    @Test
+    public void testSanityCheck() {
+        Assertions.assertNotNull(new ScriptEngineManager().getEngineByName(JS_NAME), JS_NAME);
+    }
+
+    @Test
+    public void testScriptMissingColon() {
+        assertThrows(IllegalArgumentException.class, () -> ScriptStringLookup.INSTANCE.lookup("JavaScript=\"test\""));
     }
 
     @Test
     public void testScriptUsingMultipleColons() {
         Assertions.assertEquals("It Works",
-         ScriptStringLookup.INSTANCE.lookup("javascript:true ? \"It Works\" : \"It Does Not Work\" "));
+            ScriptStringLookup.INSTANCE.lookup(JS_NAME + ":true ? \"It Works\" : \"It Does Not Work\" "));
     }
 
     @Test
-    public void testScriptMissingColon() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            ScriptStringLookup.INSTANCE.lookup("javascript=\"test\"");
-        });
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(ScriptStringLookup.INSTANCE.toString().isEmpty());
     }
 
 }

@@ -17,13 +17,13 @@
 
 package org.apache.commons.text.translate;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link EntityArrays}.
@@ -57,7 +57,7 @@ public class EntityArraysTest  {
                         EntityArrays.class.getDeclaredField(mapVariableName).get(EntityArrays.class);
                     // Validate that we are not inserting into the same key twice in the map declaration. If this,
                     // indeed was the case the keySet().size() would be smaller than the number of put() statements
-                    assertThat(mapValue.keySet().size()).isEqualTo(mapDeclarationCounter);
+                    assertThat(mapValue.size()).isEqualTo(mapDeclarationCounter);
                 }
             }
         }
@@ -114,7 +114,7 @@ public class EntityArraysTest  {
     }
 
     @Test
-    public void testJavaCntrlCharsMap() {
+    public void testJavaCtrlCharsMap() {
         testEscapeVsUnescapeMaps(EntityArrays.JAVA_CTRL_CHARS_ESCAPE, EntityArrays.JAVA_CTRL_CHARS_UNESCAPE);
     }
 

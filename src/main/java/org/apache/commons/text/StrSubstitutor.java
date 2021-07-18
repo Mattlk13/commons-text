@@ -179,7 +179,7 @@ public class StrSubstitutor {
     /**
      * Whether escapes should be preserved.  Default is false;
      */
-    private boolean preserveEscapes = false;
+    private boolean preserveEscapes;
 
     /**
      * The flag whether substitution in variable values is disabled.
@@ -1103,7 +1103,7 @@ public class StrSubstitutor {
     /**
      * Gets the variable default value delimiter matcher currently in use.
      * <p>
-     * The variable default value delimiter is the character or characters that delimite the
+     * The variable default value delimiter is the character or characters that delimit the
      * variable name and the variable default value. This delimiter is expressed in terms of a matcher
      * allowing advanced variable default value delimiter matches.
      * <p>
@@ -1118,7 +1118,7 @@ public class StrSubstitutor {
     /**
      * Sets the variable default value delimiter matcher to use.
      * <p>
-     * The variable default value delimiter is the character or characters that delimite the
+     * The variable default value delimiter is the character or characters that delimit the
      * variable name and the variable default value. This delimiter is expressed in terms of a matcher
      * allowing advanced variable default value delimiter matches.
      * <p>
@@ -1136,7 +1136,7 @@ public class StrSubstitutor {
     /**
      * Sets the variable default value delimiter to use.
      * <p>
-     * The variable default value delimiter is the character or characters that delimite the
+     * The variable default value delimiter is the character or characters that delimit the
      * variable name and the variable default value. This method allows a single character
      * variable default value delimiter to be easily set.
      *
@@ -1150,7 +1150,7 @@ public class StrSubstitutor {
     /**
      * Sets the variable default value delimiter to use.
      * <p>
-     * The variable default value delimiter is the character or characters that delimite the
+     * The variable default value delimiter is the character or characters that delimit the
      * variable name and the variable default value. This method allows a string
      * variable default value delimiter to be easily set.
      * <p>
@@ -1161,7 +1161,7 @@ public class StrSubstitutor {
      * @return this, to enable chaining
      */
     public StrSubstitutor setValueDelimiter(final String valueDelimiter) {
-        if (valueDelimiter == null || valueDelimiter.length() == 0) {
+        if (valueDelimiter == null || valueDelimiter.isEmpty()) {
             setValueDelimiterMatcher(null);
             return this;
         }

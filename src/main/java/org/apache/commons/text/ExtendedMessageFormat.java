@@ -21,12 +21,15 @@ import java.text.MessageFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Locale.Category;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.matcher.StringMatcherFactory;
 
 /**
@@ -81,7 +84,7 @@ public class ExtendedMessageFormat extends MessageFormat {
     /**
      * The empty string.
      */
-    private static final String DUMMY_PATTERN = "";
+    private static final String DUMMY_PATTERN = StringUtils.EMPTY;
 
     /**
      * A comma.
@@ -89,12 +92,12 @@ public class ExtendedMessageFormat extends MessageFormat {
     private static final char START_FMT = ',';
 
     /**
-     * A right side squigly brace.
+     * A right side squiggly brace.
      */
     private static final char END_FE = '}';
 
     /**
-     * A left side squigly brace.
+     * A left side squiggly brace.
      */
     private static final char START_FE = '{';
 
@@ -159,7 +162,9 @@ public class ExtendedMessageFormat extends MessageFormat {
                                  final Map<String, ? extends FormatFactory> registry) {
         super(DUMMY_PATTERN);
         setLocale(locale);
-        this.registry = registry;
+        this.registry = registry != null
+                ? Collections.unmodifiableMap(new HashMap<>(registry))
+                : null;
         applyPattern(pattern);
     }
 
@@ -515,9 +520,8 @@ public class ExtendedMessageFormat extends MessageFormat {
      * @param pattern pattern to parse
      * @param pos current parse position
      * @param appendTo optional StringBuilder to append
-     * @return {@code appendTo}
      */
-    private StringBuilder appendQuotedString(final String pattern, final ParsePosition pos,
+    private void appendQuotedString(final String pattern, final ParsePosition pos,
             final StringBuilder appendTo) {
         assert pattern.toCharArray()[pos.getIndex()] == QUOTE
                 : "Quoted string must start with quote character";
@@ -530,13 +534,14 @@ public class ExtendedMessageFormat extends MessageFormat {
 
         final int start = pos.getIndex();
         final char[] c = pattern.toCharArray();
-        final int lastHold = start;
         for (int i = pos.getIndex(); i < pattern.length(); i++) {
             switch (c[pos.getIndex()]) {
             case QUOTE:
                 next(pos);
-                return appendTo == null ? null : appendTo.append(c, lastHold,
-                        pos.getIndex() - lastHold);
+                if (appendTo != null) {
+                    appendTo.append(c, start, pos.getIndex() - start);
+                }
+                return;
             default:
                 next(pos);
             }

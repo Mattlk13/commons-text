@@ -17,18 +17,14 @@
 
 package org.apache.commons.text.lookup;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * A default lookup for others to extend in this package.
  *
  * @since 1.3
  */
 abstract class AbstractStringLookup implements StringLookup {
-
-
-    /**
-     * The empty string.
-     */
-    private static final String EMPTY = "";
 
     /**
      * The default split char.
@@ -41,44 +37,56 @@ abstract class AbstractStringLookup implements StringLookup {
     protected static final String SPLIT_STR = String.valueOf(SPLIT_CH);
 
     /**
-     * Returns the substring after the first occurrence of {@code ch} in {@code value}.
-     *
-     * @param value
-     *            The source string.
-     * @param ch
-     *            The character to search.
-     * @return a new string.
+     * Creates a lookup key for a given file and key.
      */
-    protected String substringAfter(final String value, final char ch) {
-        final int indexOf = value.indexOf(ch);
-        return indexOf > -1 ? value.substring(indexOf + 1) : EMPTY;
+    static String toLookupKey(final String left, final String right) {
+        return toLookupKey(left, SPLIT_STR, right);
+    }
+
+    /**
+     * Creates a lookup key for a given file and key.
+     */
+    static String toLookupKey(final String left, final String separator, final String right) {
+        return left + separator + right;
     }
 
     /**
      * Returns the substring after the first occurrence of {@code ch} in {@code value}.
      *
-     * @param value
-     *            The source string.
-     * @param ch
-     *            The character to search.
+     * @param value The source string.
+     * @param ch The character to search.
      * @return a new string.
+     * @deprecated Use {@link StringUtils#substringAfter(String, int)}.
      */
-    protected String substringAfterLast(final String value, final char ch) {
-        final int indexOf = value.lastIndexOf(ch);
-        return indexOf > -1 ? value.substring(indexOf + 1) : EMPTY;
+    @Deprecated
+    protected String substringAfter(final String value, final char ch) {
+        return StringUtils.substringAfter(value, ch);
     }
 
     /**
      * Returns the substring after the first occurrence of {@code str} in {@code value}.
      *
-     * @param value
-     *            The source string.
-     * @param str
-     *            The string to search.
+     * @param value The source string.
+     * @param str The string to search.
      * @return a new string.
+     * @deprecated Use {@link StringUtils#substringAfter(String, String)}.
      */
+    @Deprecated
     protected String substringAfter(final String value, final String str) {
-        final int indexOf = value.indexOf(str);
-        return indexOf > -1 ? value.substring(indexOf + str.length()) : EMPTY;
+        return StringUtils.substringAfter(value, str);
     }
+
+    /**
+     * Returns the substring after the first occurrence of {@code ch} in {@code value}.
+     *
+     * @param value The source string.
+     * @param ch The character to search.
+     * @return a new string.
+     * @deprecated Use {@link StringUtils#substringAfterLast(String, int)}.
+     */
+    @Deprecated
+    protected String substringAfterLast(final String value, final char ch) {
+        return StringUtils.substringAfterLast(value, ch);
+    }
+
 }

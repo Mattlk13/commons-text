@@ -35,23 +35,24 @@ public class UrlStringLookupTest {
 
     @Test
     public void testBadCharsetName() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            UrlStringLookup.INSTANCE.lookup("BAD_CHARSET_NAME:BAD_URL");
-        });
+        assertThrows(IllegalArgumentException.class, () -> UrlStringLookup.INSTANCE.lookup("BAD_CHARSET_NAME:BAD_URL"));
+    }
+
+    @Test
+    public void testBadEncoding() {
+        assertThrows(IllegalArgumentException.class, () -> UrlStringLookup.INSTANCE.lookup("FOO:https://www.google.com"));
     }
 
     @Test
     public void testBadUrl() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            UrlStringLookup.INSTANCE.lookup("UTF-8:BAD_URL");
-        });
+        assertThrows(IllegalArgumentException.class, () -> UrlStringLookup.INSTANCE.lookup("UTF-8:BAD_URL"));
     }
 
     @Test
     public void testFileScheme() throws Exception {
         final Path path = Paths.get("src/test/resources/document.properties");
         final URI uri = path.toUri();
-        System.out.println(uri);
+        // System.out.println(uri);
         final byte[] expectedBytes = Files.readAllBytes(path);
         final String expectedString = new String(expectedBytes, StandardCharsets.UTF_8);
         Assertions.assertEquals(expectedString, UrlStringLookup.INSTANCE.lookup("UTF-8:" + uri.toString()));
@@ -64,8 +65,19 @@ public class UrlStringLookupTest {
     }
 
     @Test
+    public void testMissingUrl() {
+        assertThrows(IllegalArgumentException.class, () -> UrlStringLookup.INSTANCE.lookup("UTF-8"));
+    }
+
+    @Test
     public void testNull() {
         Assertions.assertNull(UrlStringLookup.INSTANCE.lookup(null));
+    }
+
+    @Test
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(UrlStringLookup.INSTANCE.toString().isEmpty());
     }
 
 }

@@ -29,6 +29,9 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * <p>
  * Convert from one alphabet to another, with the possibility of leaving certain
@@ -161,7 +164,7 @@ public final class AlphabetConverter {
         final StringBuilder result = new StringBuilder();
 
         for (int j = 0; j < encoded.length();) {
-            final Integer i = encoded.codePointAt(j);
+            final int i = encoded.codePointAt(j);
             final String s = codePointToString(i);
 
             if (s.equals(originalToEncoded.get(i))) {
@@ -229,22 +232,20 @@ public final class AlphabetConverter {
 
         if (level > 0) {
             for (final int encodingLetter : encoding) {
-                if (originals.hasNext()) {
-
-                    // this skips the doNotEncode chars if they are in the
-                    // leftmost place
-                    if (level != encodedLetterLength
-                            || !doNotEncodeMap.containsKey(encodingLetter)) {
-                        addSingleEncoding(level - 1,
-                                currentEncoding
-                                        + codePointToString(encodingLetter),
-                                encoding,
-                                originals,
-                                doNotEncodeMap
-                        );
-                    }
-                } else {
+                if (!originals.hasNext()) {
                     return; // done encoding all the original alphabet
+                }
+                // this skips the doNotEncode chars if they are in the
+                // leftmost place
+                if (level != encodedLetterLength
+                        || !doNotEncodeMap.containsKey(encodingLetter)) {
+                    addSingleEncoding(level - 1,
+                            currentEncoding
+                                    + codePointToString(encodingLetter),
+                            encoding,
+                            originals,
+                            doNotEncodeMap
+                    );
                 }
             }
         } else {
@@ -375,8 +376,8 @@ public final class AlphabetConverter {
      * @return an equivalent array of integers
      */
     private static Integer[] convertCharsToIntegers(final Character[] chars) {
-        if (chars == null || chars.length == 0) {
-            return new Integer[0];
+        if (ArrayUtils.isEmpty(chars)) {
+            return ArrayUtils.EMPTY_INTEGER_OBJECT_ARRAY;
         }
         final Integer[] integers = new Integer[chars.length];
         for (int i = 0; i < chars.length; i++) {
@@ -415,7 +416,7 @@ public final class AlphabetConverter {
         final Map<String, String> encodedToOriginal = new LinkedHashMap<>();
         final Map<Integer, String> doNotEncodeMap = new HashMap<>();
 
-        int encodedLetterLength;
+        final int encodedLetterLength;
 
         for (final int i : doNotEncodeCopy) {
             if (!originalCopy.contains(i)) {
@@ -467,41 +468,41 @@ public final class AlphabetConverter {
                     encodedToOriginal,
                     encodedLetterLength);
 
-        } else if (encodingCopy.size() - doNotEncodeCopy.size() < 2) {
+        }
+        if (encodingCopy.size() - doNotEncodeCopy.size() < 2) {
             throw new IllegalArgumentException(
                     "Must have at least two encoding characters (excluding "
                             + "those in the 'do not encode' list), but has "
                             + (encodingCopy.size() - doNotEncodeCopy.size()));
-        } else {
-            // we start with one which is our minimum, and because we do the
-            // first division outside the loop
-            int lettersSoFar = 1;
-
-            // the first division takes into account that the doNotEncode
-            // letters can't be in the leftmost place
-            int lettersLeft = (originalCopy.size() - doNotEncodeCopy.size())
-                    / (encodingCopy.size() - doNotEncodeCopy.size());
-
-            while (lettersLeft / encodingCopy.size() >= 1) {
-                lettersLeft = lettersLeft / encodingCopy.size();
-                lettersSoFar++;
-            }
-
-            encodedLetterLength = lettersSoFar + 1;
-
-            final AlphabetConverter ac =
-                    new AlphabetConverter(originalToEncoded,
-                            encodedToOriginal,
-                            encodedLetterLength);
-
-            ac.addSingleEncoding(encodedLetterLength,
-                    "",
-                    encodingCopy,
-                    originalCopy.iterator(),
-                    doNotEncodeMap);
-
-            return ac;
         }
+        // we start with one which is our minimum, and because we do the
+        // first division outside the loop
+        int lettersSoFar = 1;
+
+        // the first division takes into account that the doNotEncode
+        // letters can't be in the leftmost place
+        int lettersLeft = (originalCopy.size() - doNotEncodeCopy.size())
+                / (encodingCopy.size() - doNotEncodeCopy.size());
+
+        while (lettersLeft / encodingCopy.size() >= 1) {
+            lettersLeft = lettersLeft / encodingCopy.size();
+            lettersSoFar++;
+        }
+
+        encodedLetterLength = lettersSoFar + 1;
+
+        final AlphabetConverter ac =
+                new AlphabetConverter(originalToEncoded,
+                        encodedToOriginal,
+                        encodedLetterLength);
+
+        ac.addSingleEncoding(encodedLetterLength,
+                StringUtils.EMPTY,
+                encodingCopy,
+                originalCopy.iterator(),
+                doNotEncodeMap);
+
+        return ac;
     }
 
     /**

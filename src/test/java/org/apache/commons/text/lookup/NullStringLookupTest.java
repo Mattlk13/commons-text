@@ -21,13 +21,20 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link NullStringLookup}.
+ * Tests {@link StringLookupFactory#INSTANCE_NULL}.
  */
 public class NullStringLookupTest {
 
     @Test
     public void test() {
-        Assertions.assertEquals(null, NullStringLookup.INSTANCE.lookup("EverythingIsNull"));
+        Assertions.assertNull(StringLookupFactory.INSTANCE_NULL.lookup("EverythingIsNull"));
+        Assertions.assertNull(StringLookupFactory.INSTANCE_NULL.lookup(null));
+    }
+
+    @Test
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(StringLookupFactory.INSTANCE_NULL.toString().isEmpty());
     }
 
 }

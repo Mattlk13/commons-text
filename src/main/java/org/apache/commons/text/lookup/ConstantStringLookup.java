@@ -63,22 +63,36 @@ import org.apache.commons.text.StringSubstitutor;
  */
 class ConstantStringLookup extends AbstractStringLookup {
 
+    /** An internally used cache for already retrieved values. */
+    private static final ConcurrentHashMap<String, String> CONSTANT_CACHE = new ConcurrentHashMap<>();
+
     /** Constant for the field separator. */
-    private static final char FIELD_SEPRATOR = '.';
+    private static final char FIELD_SEPARATOR = '.';
 
     /**
      * Defines the singleton for this class.
      */
     static final ConstantStringLookup INSTANCE = new ConstantStringLookup();
 
-    /** An internally used cache for already retrieved values. */
-    private static ConcurrentHashMap<String, String> constantCache = new ConcurrentHashMap<>();
-
     /**
      * Clears the shared cache with the so far resolved constants.
      */
     static void clear() {
-        constantCache.clear();
+        CONSTANT_CACHE.clear();
+    }
+
+    /**
+     * Loads the class with the specified name. If an application has special needs regarding the class loaders to be
+     * used, it can hook in here. This implementation delegates to the {@code getClass()} method of Commons Lang's
+     * <code><a href="https://commons.apache.org/lang/api-release/org/apache/commons/lang/ClassUtils.html">
+     * ClassUtils</a></code>.
+     *
+     * @param className the name of the class to be loaded
+     * @return The corresponding class object
+     * @throws ClassNotFoundException if the class cannot be loaded
+     */
+    protected Class<?> fetchClass(final String className) throws ClassNotFoundException {
+        return ClassUtils.getClass(className);
     }
 
     /**
@@ -96,11 +110,11 @@ class ConstantStringLookup extends AbstractStringLookup {
             return null;
         }
         String result;
-        result = constantCache.get(key);
+        result = CONSTANT_CACHE.get(key);
         if (result != null) {
             return result;
         }
-        final int fieldPos = key.lastIndexOf(FIELD_SEPRATOR);
+        final int fieldPos = key.lastIndexOf(FIELD_SEPARATOR);
         if (fieldPos < 0) {
             return null;
         }
@@ -108,7 +122,7 @@ class ConstantStringLookup extends AbstractStringLookup {
             final Object value = resolveField(key.substring(0, fieldPos), key.substring(fieldPos + 1));
             if (value != null) {
                 final String string = Objects.toString(value, null);
-                constantCache.put(key, string);
+                CONSTANT_CACHE.put(key, string);
                 result = string;
             }
         } catch (final Exception ex) {
@@ -134,19 +148,5 @@ class ConstantStringLookup extends AbstractStringLookup {
             return null;
         }
         return clazz.getField(fieldName).get(null);
-    }
-
-    /**
-     * Loads the class with the specified name. If an application has special needs regarding the class loaders to be
-     * used, it can hook in here. This implementation delegates to the {@code getClass()} method of Commons Lang's
-     * <code><a href="https://commons.apache.org/lang/api-release/org/apache/commons/lang/ClassUtils.html">
-     * ClassUtils</a></code>.
-     *
-     * @param className the name of the class to be loaded
-     * @return The corresponding class object
-     * @throws ClassNotFoundException if the class cannot be loaded
-     */
-    protected Class<?> fetchClass(final String className) throws ClassNotFoundException {
-        return ClassUtils.getClass(className);
     }
 }

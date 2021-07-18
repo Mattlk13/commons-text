@@ -35,31 +35,41 @@ import java.util.ResourceBundle;
 final class ResourceBundleStringLookup extends AbstractStringLookup {
 
     /**
-     * The name of the resource bundle from which to look something up.
-     */
-    private final String bundleName;
-
-    /**
      * Defines the singleton for this class.
      */
     static final ResourceBundleStringLookup INSTANCE = new ResourceBundleStringLookup();
 
     /**
-     * No need to build instances for now.
+     * The name of the resource bundle from which to look something up.
      */
-    private ResourceBundleStringLookup() {
+    private final String bundleName;
+
+    /**
+     * Constructs a blank instance.
+     *
+     * This ctor is not private to allow Mockito spying.
+     */
+    ResourceBundleStringLookup() {
         this(null);
     }
 
     /**
      * Constructs an instance that only works for the given bundle.
      *
-     * @param bundleName
-     *            the name of the resource bundle from which we will look keys up.
+     * @param bundleName the name of the resource bundle from which we will look keys up.
      * @since 1.5
      */
     ResourceBundleStringLookup(final String bundleName) {
         this.bundleName = bundleName;
+    }
+
+    ResourceBundle getBundle(final String keyBundleName) {
+        // The ResourceBundle class caches bundles, no need to cache here.
+        return ResourceBundle.getBundle(keyBundleName);
+    }
+
+    String getString(final String keyBundleName, final String bundleKey) {
+        return getBundle(keyBundleName).getString(bundleKey);
     }
 
     /**
@@ -67,8 +77,7 @@ final class ResourceBundleStringLookup extends AbstractStringLookup {
      *
      * For example: "com.domain.messages:MyKey".
      *
-     * @param key
-     *            the key to be looked up, may be null
+     * @param key the key to be looked up, may be null
      * @return The value associated with the key.
      * @see ResourceBundle
      * @see ResourceBundle#getBundle(String)
@@ -84,23 +93,29 @@ final class ResourceBundleStringLookup extends AbstractStringLookup {
         final boolean anyBundle = bundleName == null;
         if (anyBundle && keyLen != 2) {
             throw IllegalArgumentExceptions
-                    .format("Bad resource bundle key format [%s]; expected format is BundleName:KeyName.", key);
-        } else if (bundleName != null && keyLen != 1) {
+                .format("Bad resource bundle key format [%s]; expected format is BundleName:KeyName.", key);
+        }
+        if (bundleName != null && keyLen != 1) {
             throw IllegalArgumentExceptions.format("Bad resource bundle key format [%s]; expected format is KeyName.",
-                    key);
+                key);
         }
         final String keyBundleName = anyBundle ? keys[0] : bundleName;
         final String bundleKey = anyBundle ? keys[1] : keys[0];
         try {
-            // The ResourceBundle class caches bundles, no need to cache here.
-            return ResourceBundle.getBundle(keyBundleName).getString(bundleKey);
+            return getString(keyBundleName, bundleKey);
         } catch (final MissingResourceException e) {
             // The key is missing, return null such that an interpolator can supply a default value.
             return null;
         } catch (final Exception e) {
+            // Should only be a ClassCastException
             throw IllegalArgumentExceptions.format(e, "Error looking up resource bundle [%s] and key [%s].",
-                    keyBundleName, bundleKey);
+                keyBundleName, bundleKey);
         }
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [bundleName=" + bundleName + "]";
     }
 
 }

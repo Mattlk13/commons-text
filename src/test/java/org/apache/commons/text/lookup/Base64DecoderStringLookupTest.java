@@ -21,18 +21,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link Base64DecoderStringLookup}.
+ * Tests {@link StringLookupFactory#INSTANCE_BASE64_DECODER}.
  */
 public class Base64DecoderStringLookupTest {
 
     @Test
     public void test() {
-        Assertions.assertEquals("HelloWorld!", Base64DecoderStringLookup.INSTANCE.lookup("SGVsbG9Xb3JsZCE="));
+        Assertions.assertEquals("HelloWorld!", StringLookupFactory.INSTANCE_BASE64_DECODER.lookup("SGVsbG9Xb3JsZCE="));
     }
 
     @Test
     public void testNull() {
-        Assertions.assertNull(Base64DecoderStringLookup.INSTANCE.lookup(null));
+        Assertions.assertNull(StringLookupFactory.INSTANCE_BASE64_DECODER.lookup(null));
+    }
+
+    @Test
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(StringLookupFactory.INSTANCE_BASE64_DECODER.toString().isEmpty());
     }
 
 }

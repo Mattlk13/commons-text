@@ -16,17 +16,18 @@
  */
 package org.apache.commons.text;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>Case manipulation operations on Strings that contain words.</p>
  *
  * <p>This class tries to handle {@code null} input gracefully.
  * An exception will not be thrown for a {@code null} input.
- * Each method documents its behaviour in more detail.</p>
+ * Each method documents its behavior in more detail.</p>
  *
  * @since 1.2
  */
@@ -41,12 +42,11 @@ public class CaseUtils {
      * instance to operate.</p>
      */
     public CaseUtils() {
-        super();
     }
 
     /**
      * <p>Converts all the delimiter separated words in a String into camelCase,
-     * that is each word is made up of a titlecase character and then a series of
+     * that is each word is made up of a title case character and then a series of
      * lowercase characters.</p>
      *
      * <p>The delimiters represent a set of characters understood to separate words.
@@ -54,9 +54,12 @@ public class CaseUtils {
      * character may or may not be capitalized and it's determined by the user input for capitalizeFirstLetter
      * variable.</p>
      *
-     * <p>A {@code null} input String returns {@code null}.
+     * <p>A {@code null} input String returns {@code null}.</p>
+     *
+     * <p>A input string with only delimiter characters returns {@code ""}.</p>
+     *
      * Capitalization uses the Unicode title case, normally equivalent to
-     * upper case and cannot perform locale-sensitive mappings.</p>
+     * upper case and cannot perform locale-sensitive mappings.
      *
      * <pre>
      * CaseUtils.toCamelCase(null, false)                                 = null
@@ -66,6 +69,7 @@ public class CaseUtils {
      * CaseUtils.toCamelCase("To.Camel.Case", false, new char[]{'.'})     = "toCamelCase"
      * CaseUtils.toCamelCase(" to @ Camel case", true, new char[]{'@'})   = "ToCamelCase"
      * CaseUtils.toCamelCase(" @to @ Camel case", false, new char[]{'@'}) = "toCamelCase"
+     * CaseUtils.toCamelCase(" @", false, new char[]{'@'})                = ""
      * </pre>
      *
      * @param str  the String to be converted to camelCase, may be null
@@ -82,18 +86,12 @@ public class CaseUtils {
         final int[] newCodePoints = new int[strLen];
         int outOffset = 0;
         final Set<Integer> delimiterSet = generateDelimiterSet(delimiters);
-        boolean capitalizeNext = false;
-        if (capitalizeFirstLetter) {
-            capitalizeNext = true;
-        }
+        boolean capitalizeNext = capitalizeFirstLetter;
         for (int index = 0; index < strLen;) {
             final int codePoint = str.codePointAt(index);
 
             if (delimiterSet.contains(codePoint)) {
-                capitalizeNext = true;
-                if (outOffset == 0) {
-                    capitalizeNext = false;
-                }
+                capitalizeNext = outOffset != 0;
                 index += Character.charCount(codePoint);
             } else if (capitalizeNext || outOffset == 0 && capitalizeFirstLetter) {
                 final int titleCaseCodePoint = Character.toTitleCase(codePoint);
@@ -105,10 +103,8 @@ public class CaseUtils {
                 index += Character.charCount(codePoint);
             }
         }
-        if (outOffset != 0) {
-            return new String(newCodePoints, 0, outOffset);
-        }
-        return str;
+
+        return new String(newCodePoints, 0, outOffset);
     }
 
     /**
@@ -121,7 +117,7 @@ public class CaseUtils {
     private static Set<Integer> generateDelimiterSet(final char[] delimiters) {
         final Set<Integer> delimiterHashSet = new HashSet<>();
         delimiterHashSet.add(Character.codePointAt(new char[]{' '}, 0));
-        if (delimiters == null || delimiters.length == 0) {
+        if (ArrayUtils.isEmpty(delimiters)) {
             return delimiterHashSet;
         }
 

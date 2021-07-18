@@ -17,11 +17,13 @@
 
 package org.apache.commons.text.lookup;
 
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.InputSource;
 
 /**
@@ -55,8 +57,7 @@ final class XmlStringLookup extends AbstractStringLookup {
      * For example: "com/domain/document.xml:/path/to/node".
      * </p>
      *
-     * @param key
-     *            the key to be looked up, may be null
+     * @param key the key to be looked up, may be null
      * @return The value associated with the key.
      */
     @Override
@@ -68,16 +69,15 @@ final class XmlStringLookup extends AbstractStringLookup {
         final int keyLen = keys.length;
         if (keyLen != 2) {
             throw IllegalArgumentExceptions.format("Bad XML key format [%s]; expected format is DocumentPath:XPath.",
-                    key);
+                key);
         }
         final String documentPath = keys[0];
-        final String xpath = substringAfter(key, SPLIT_CH);
-        try {
-            return XPathFactory.newInstance().newXPath().evaluate(xpath,
-                    new InputSource(Files.newInputStream(Paths.get(documentPath))));
+        final String xpath = StringUtils.substringAfter(key, SPLIT_CH);
+        try (InputStream inputStream = Files.newInputStream(Paths.get(documentPath))) {
+            return XPathFactory.newInstance().newXPath().evaluate(xpath, new InputSource(inputStream));
         } catch (final Exception e) {
             throw IllegalArgumentExceptions.format(e, "Error looking up XML document [%s] and XPath [%s].",
-                    documentPath, xpath);
+                documentPath, xpath);
         }
     }
 

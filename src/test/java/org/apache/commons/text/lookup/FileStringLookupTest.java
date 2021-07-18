@@ -33,16 +33,17 @@ public class FileStringLookupTest {
 
     @Test
     public void testBadCharsetName() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            FileStringLookup.INSTANCE.lookup("BAD_CHARSET_NAME:src/test/resources/document.properties");
-        });
+        assertThrows(IllegalArgumentException.class, () -> FileStringLookup.INSTANCE.lookup("BAD_CHARSET_NAME:src/test/resources/document.properties"));
     }
 
     @Test
     public void testBadDocumentPath() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            FileStringLookup.INSTANCE.lookup("BAD_CHARSET_NAME:src/test/resources/DOCUMENT_NOT_FOUND.TXT");
-        });
+        assertThrows(IllegalArgumentException.class, () -> FileStringLookup.INSTANCE.lookup("BAD_CHARSET_NAME:src/test/resources/DOCUMENT_NOT_FOUND.TXT"));
+    }
+
+    @Test
+    public void testMissingFilePart() {
+        assertThrows(IllegalArgumentException.class, () -> FileStringLookup.INSTANCE.lookup(StandardCharsets.UTF_8.name()));
     }
 
     @Test
@@ -55,6 +56,12 @@ public class FileStringLookupTest {
         final byte[] expectedBytes = Files.readAllBytes(Paths.get("src/test/resources/document.properties"));
         final String expectedString = new String(expectedBytes, StandardCharsets.UTF_8);
         Assertions.assertEquals(expectedString,
-                FileStringLookup.INSTANCE.lookup("UTF-8:src/test/resources/document.properties"));
+            FileStringLookup.INSTANCE.lookup("UTF-8:src/test/resources/document.properties"));
+    }
+
+    @Test
+    public void testToString() {
+        // does not blow up and gives some kind of string.
+        Assertions.assertFalse(FileStringLookup.INSTANCE.toString().isEmpty());
     }
 }

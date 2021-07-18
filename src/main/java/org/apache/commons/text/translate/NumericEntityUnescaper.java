@@ -19,29 +19,52 @@ package org.apache.commons.text.translate;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
- * Translate XML numeric entities of the form &amp;#[xX]?\d+;? to
+ * Translates XML numeric entities of the form &amp;#[xX]?\d+;? to
  * the specific codepoint.
  *
- * Note that the semi-colon is optional.
+ * Note that the semicolon is optional.
  *
  * @since 1.0
  */
 public class NumericEntityUnescaper extends CharSequenceTranslator {
 
-    /** NumericEntityUnescaper option enum. */
-    public enum OPTION { semiColonRequired, semiColonOptional, errorIfNoSemiColon }
+    /** Default options. */
+    private static final EnumSet<OPTION> DEFAULT_OPTIONS = EnumSet
+        .copyOf(Collections.singletonList(OPTION.semiColonRequired));
 
-    /** EnumSet of OPTIONS, given from the constructor. */
+    /** Enumerates NumericEntityUnescaper options for unescaping. */
+    public enum OPTION {
+
+        /**
+         * Requires a semicolon.
+         */
+        semiColonRequired,
+
+        /**
+         * Does not require a semicolon.
+         */
+        semiColonOptional,
+
+        /**
+         * Throws an exception if a semicolon is missing.
+         */
+        errorIfNoSemiColon
+    }
+
+    /** EnumSet of OPTIONS, given from the constructor, read-only. */
     private final EnumSet<OPTION> options;
 
     /**
-     * Create a UnicodeUnescaper.
+     * Creates a UnicodeUnescaper.
      *
      * The constructor takes a list of options, only one type of which is currently
-     * available (whether to allow, error or ignore the semi-colon on the end of a
+     * available (whether to allow, error or ignore the semicolon on the end of a
      * numeric entity to being missing).
      *
      * For example, to support numeric entities without a ';':
@@ -49,33 +72,29 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
      * and to throw an IllegalArgumentException when they're missing:
      *    new NumericEntityUnescaper(NumericEntityUnescaper.OPTION.errorIfNoSemiColon)
      *
-     * Note that the default behaviour is to ignore them.
+     * Note that the default behavior is to ignore them.
      *
      * @param options to apply to this unescaper
      */
     public NumericEntityUnescaper(final OPTION... options) {
-        if (options.length > 0) {
-            this.options = EnumSet.copyOf(Arrays.asList(options));
-        } else {
-            this.options = EnumSet.copyOf(Arrays.asList(OPTION.semiColonRequired));
-        }
+        this.options = ArrayUtils.isEmpty(options) ? DEFAULT_OPTIONS : EnumSet.copyOf(Arrays.asList(options));
     }
 
     /**
-     * Whether the passed in option is currently set.
+     * Tests whether the passed in option is currently set.
      *
      * @param option to check state of
      * @return whether the option is set
      */
     public boolean isSet(final OPTION option) {
-        return options != null && options.contains(option);
+        return options.contains(option);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int translate(final CharSequence input, final int index, final Writer out) throws IOException {
+    public int translate(final CharSequence input, final int index, final Writer writer) throws IOException {
         final int seqEnd = input.length();
         // Uses -2 to ensure there is something after the &#
         if (input.charAt(index) == '&' && index < seqEnd - 2 && input.charAt(index + 1) == '#') {
@@ -112,7 +131,7 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
                 }
             }
 
-            int entityValue;
+            final int entityValue;
             try {
                 if (isHex) {
                     entityValue = Integer.parseInt(input.subSequence(start, end).toString(), 16);
@@ -125,10 +144,10 @@ public class NumericEntityUnescaper extends CharSequenceTranslator {
 
             if (entityValue > 0xFFFF) {
                 final char[] chrs = Character.toChars(entityValue);
-                out.write(chrs[0]);
-                out.write(chrs[1]);
+                writer.write(chrs[0]);
+                writer.write(chrs[1]);
             } else {
-                out.write(entityValue);
+                writer.write(entityValue);
             }
 
             return 2 + end - start + (isHex ? 1 : 0) + (semiNext ? 1 : 0);

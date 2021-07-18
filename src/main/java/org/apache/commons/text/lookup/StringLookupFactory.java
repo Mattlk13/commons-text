@@ -17,12 +17,28 @@
 
 package org.apache.commons.text.lookup;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.apache.commons.text.StringSubstitutor;
 
 /**
- * Provides access to lookups defined in this package.
+ * Create instances of string lookups or access singleton string lookups implemented in this package.
+ * <p>
+ * The "classic" look up is {@link #mapStringLookup(Map)}.
+ * </p>
+ * <p>
+ * The methods for variable interpolation (A.K.A. variable substitution) are:
+ * </p>
+ * <ul>
+ * <li>{@link #interpolatorStringLookup()}.</li>
+ * <li>{@link #interpolatorStringLookup(Map)}.</li>
+ * <li>{@link #interpolatorStringLookup(StringLookup)}.</li>
+ * <li>{@link #interpolatorStringLookup(Map, StringLookup, boolean)}.</li>
+ * </ul>
  * <p>
  * The default lookups are:
  * </p>
@@ -30,111 +46,131 @@ import org.apache.commons.text.StringSubstitutor;
  * <caption>Default String Lookups</caption>
  * <tr>
  * <th>Key</th>
- * <th>Implementation</th>
+ * <th>Interface</th>
  * <th>Factory Method</th>
  * <th>Since</th>
  * </tr>
  * <tr>
  * <td>{@value #KEY_BASE64_DECODER}</td>
- * <td>{@link Base64DecoderStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #base64DecoderStringLookup()}</td>
  * <td>1.6</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_BASE64_ENCODER}</td>
- * <td>{@link Base64EncoderStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #base64EncoderStringLookup()}</td>
  * <td>1.6</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_CONST}</td>
- * <td>{@link ConstantStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #constantStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_DATE}</td>
- * <td>{@link DateStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #dateStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_DNS}</td>
- * <td>{@link DnsStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #dnsStringLookup()}</td>
  * <td>1.8</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_ENV}</td>
- * <td>{@link EnvironmentVariableStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #environmentVariableStringLookup()}</td>
  * <td>1.3</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_FILE}</td>
- * <td>{@link FileStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #fileStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_JAVA}</td>
- * <td>{@link JavaPlatformStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #javaPlatformStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_LOCALHOST}</td>
- * <td>{@link LocalHostStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #localHostStringLookup()}</td>
  * <td>1.3</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_PROPERTIES}</td>
- * <td>{@link PropertiesStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #propertiesStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_RESOURCE_BUNDLE}</td>
- * <td>{@link ResourceBundleStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #resourceBundleStringLookup()}</td>
  * <td>1.6</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_SCRIPT}</td>
- * <td>{@link ScriptStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #scriptStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_SYS}</td>
- * <td>{@link SystemPropertyStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #systemPropertyStringLookup()}</td>
  * <td>1.3</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_URL}</td>
- * <td>{@link UrlStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #urlStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_URL_DECODER}</td>
- * <td>{@link UrlDecoderStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #urlDecoderStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_URL_ENCODER}</td>
- * <td>{@link UrlEncoderStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #urlEncoderStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_XML}</td>
- * <td>{@link XmlStringLookup}</td>
+ * <td>{@link StringLookup}</td>
  * <td>{@link #xmlStringLookup()}</td>
  * <td>1.5</td>
+ * </tr>
+ * </table>
+ * <p>
+ * We also provide functional lookups used as building blocks for other lookups.
+ * <table>
+ * <caption>Functional String Lookups</caption>
+ * <tr>
+ * <th>Interface</th>
+ * <th>Factory Method</th>
+ * <th>Since</th>
+ * </tr>
+ * <tr>
+ * <td>{@link BiStringLookup}</td>
+ * <td>{@link #biFunctionStringLookup(BiFunction)}</td>
+ * <td>1.9</td>
+ * </tr>
+ * <tr>
+ * <td>{@link StringLookup}</td>
+ * <td>{@link #functionStringLookup(Function)}</td>
+ * <td>1.9</td>
  * </tr>
  * </table>
  *
@@ -146,6 +182,86 @@ public final class StringLookupFactory {
      * Defines the singleton for this class.
      */
     public static final StringLookupFactory INSTANCE = new StringLookupFactory();
+
+    /**
+     * Decodes Base64 Strings.
+     * <p>
+     * Using a {@link StringLookup} from the {@link StringLookupFactory}:
+     * </p>
+     *
+     * <pre>
+     * StringLookupFactory.INSTANCE.base64DecoderStringLookup().lookup("SGVsbG9Xb3JsZCE=");
+     * </pre>
+     * <p>
+     * Using a {@link StringSubstitutor}:
+     * </p>
+     *
+     * <pre>
+     * StringSubstitutor.createInterpolator().replace("... ${base64Decoder:SGVsbG9Xb3JsZCE=} ..."));
+     * </pre>
+     * <p>
+     * The above examples convert {@code "SGVsbG9Xb3JsZCE="} to {@code "HelloWorld!"}.
+     * </p>
+     */
+    static final FunctionStringLookup<String> INSTANCE_BASE64_DECODER = FunctionStringLookup
+        .on(key -> new String(Base64.getDecoder().decode(key), StandardCharsets.ISO_8859_1));
+
+    /**
+     * Encodes Base64 Strings.
+     * <p>
+     * Using a {@link StringLookup} from the {@link StringLookupFactory}:
+     * </p>
+     *
+     * <pre>
+     * StringLookupFactory.INSTANCE.base64EncoderStringLookup().lookup("HelloWorld!");
+     * </pre>
+     * <p>
+     * Using a {@link StringSubstitutor}:
+     * </p>
+     *
+     * <pre>
+     * StringSubstitutor.createInterpolator().replace("... ${base64Encoder:HelloWorld!} ..."));
+     * </pre>
+     * <p>
+     * The above examples convert {@code "HelloWorld!"} to {@code "SGVsbG9Xb3JsZCE="}.
+     * </p>
+     * Defines the singleton for this class.
+     */
+    static final FunctionStringLookup<String> INSTANCE_BASE64_ENCODER = FunctionStringLookup
+        .on(key -> Base64.getEncoder().encodeToString(key.getBytes(StandardCharsets.ISO_8859_1)));
+
+    /**
+     * Looks up keys from environment variables.
+     * <p>
+     * Using a {@link StringLookup} from the {@link StringLookupFactory}:
+     * </p>
+     *
+     * <pre>
+     * StringLookupFactory.INSTANCE.dateStringLookup().lookup("USER");
+     * </pre>
+     * <p>
+     * Using a {@link StringSubstitutor}:
+     * </p>
+     *
+     * <pre>
+     * StringSubstitutor.createInterpolator().replace("... ${env:USER} ..."));
+     * </pre>
+     * <p>
+     * The above examples convert (on Linux) {@code "USER"} to the current user name. On Windows 10, you would use
+     * {@code "USERNAME"} to the same effect.
+     * </p>
+     */
+    static final FunctionStringLookup<String> INSTANCE_ENVIRONMENT_VARIABLES = FunctionStringLookup.on(System::getenv);
+
+    /**
+     * Defines the FunctionStringLookup singleton that always returns null.
+     */
+    static final FunctionStringLookup<String> INSTANCE_NULL = FunctionStringLookup.on(key -> null);
+
+    /**
+     * Defines the FunctionStringLookup singleton for looking up system properties.
+     */
+    static final FunctionStringLookup<String> INSTANCE_SYSTEM_PROPERTIES = FunctionStringLookup.on(System::getProperty);
 
     /**
      * Default lookup key for interpolation {@value #KEY_BASE64_DECODER}.
@@ -291,10 +407,10 @@ public final class StringLookupFactory {
     public void addDefaultStringLookups(final Map<String, StringLookup> stringLookupMap) {
         if (stringLookupMap != null) {
             // "base64" is deprecated in favor of KEY_BASE64_DECODER.
-            stringLookupMap.put("base64", Base64DecoderStringLookup.INSTANCE);
+            stringLookupMap.put("base64", StringLookupFactory.INSTANCE_BASE64_DECODER);
             for (final DefaultStringLookup stringLookup : DefaultStringLookup.values()) {
                 stringLookupMap.put(InterpolatorStringLookup.toKey(stringLookup.getKey()),
-                        stringLookup.getStringLookup());
+                    stringLookup.getStringLookup());
             }
         }
     }
@@ -323,7 +439,7 @@ public final class StringLookupFactory {
      * @since 1.5
      */
     public StringLookup base64DecoderStringLookup() {
-        return Base64DecoderStringLookup.INSTANCE;
+        return StringLookupFactory.INSTANCE_BASE64_DECODER;
     }
 
     /**
@@ -350,7 +466,7 @@ public final class StringLookupFactory {
      * @since 1.6
      */
     public StringLookup base64EncoderStringLookup() {
-        return Base64EncoderStringLookup.INSTANCE;
+        return StringLookupFactory.INSTANCE_BASE64_ENCODER;
     }
 
     /**
@@ -379,7 +495,21 @@ public final class StringLookupFactory {
      */
     @Deprecated
     public StringLookup base64StringLookup() {
-        return Base64DecoderStringLookup.INSTANCE;
+        return StringLookupFactory.INSTANCE_BASE64_DECODER;
+    }
+
+    /**
+     * Returns a new function-based lookup where the request for a lookup is answered by applying the function with a
+     * lookup key.
+     *
+     * @param <R> the function return type.
+     * @param <U> the function's second parameter type.
+     * @param biFunction the function.
+     * @return a new MapStringLookup.
+     * @since 1.9
+     */
+    public <R, U> BiStringLookup<U> biFunctionStringLookup(final BiFunction<String, U, R> biFunction) {
+        return BiFunctionStringLookup.on(biFunction);
     }
 
     /**
@@ -448,6 +578,39 @@ public final class StringLookupFactory {
     }
 
     /**
+     * Returns the DnsStringLookup singleton instance where the lookup key is one of:
+     * <ul>
+     * <li><b>name</b>: for the local host name, for example {@code EXAMPLE} but also {@code EXAMPLE.apache.org}.</li>
+     * <li><b>canonical-name</b>: for the local canonical host name, for example {@code EXAMPLE.apache.org}.</li>
+     * <li><b>address</b>: for the local host address, for example {@code 192.168.56.1}.</li>
+     * </ul>
+     *
+     * <p>
+     * Using a {@link StringLookup} from the {@link StringLookupFactory}:
+     * </p>
+     *
+     * <pre>
+     * StringLookupFactory.INSTANCE.dnsStringLookup().lookup("address|apache.org");
+     * </pre>
+     * <p>
+     * Using a {@link StringSubstitutor}:
+     * </p>
+     *
+     * <pre>
+     * StringSubstitutor.createInterpolator().replace("... ${dns:address|apache.org} ..."));
+     * </pre>
+     * <p>
+     * The above examples convert {@code "address|apache.org"} to {@code "95.216.24.32} (or {@code "40.79.78.1"}).
+     * </p>
+     *
+     * @return the DateStringLookup singleton instance.
+     * @since 1.8
+     */
+    public StringLookup dnsStringLookup() {
+        return DnsStringLookup.INSTANCE;
+    }
+
+    /**
      * Returns the EnvironmentVariableStringLookup singleton instance where the lookup key is an environment variable
      * name.
      * <p>
@@ -472,7 +635,7 @@ public final class StringLookupFactory {
      * @return The EnvironmentVariableStringLookup singleton instance.
      */
     public StringLookup environmentVariableStringLookup() {
-        return EnvironmentVariableStringLookup.INSTANCE;
+        return StringLookupFactory.INSTANCE_ENVIRONMENT_VARIABLES;
     }
 
     /**
@@ -500,6 +663,19 @@ public final class StringLookupFactory {
      */
     public StringLookup fileStringLookup() {
         return FileStringLookup.INSTANCE;
+    }
+
+    /**
+     * Returns a new function-based lookup where the request for a lookup is answered by applying the function with a
+     * lookup key.
+     *
+     * @param <R> the function return type.
+     * @param function the function.
+     * @return a new MapStringLookup.
+     * @since 1.9
+     */
+    public <R> StringLookup functionStringLookup(final Function<String, R> function) {
+        return FunctionStringLookup.on(function);
     }
 
     /**
@@ -538,14 +714,14 @@ public final class StringLookupFactory {
      * {@code stringLookupMap}:
      * </p>
      *
-     * @param stringLookupMap     the map of string lookups.
+     * @param stringLookupMap the map of string lookups.
      * @param defaultStringLookup the default string lookup.
-     * @param addDefaultLookups   whether to use lookups as described above.
+     * @param addDefaultLookups whether to use lookups as described above.
      * @return a new InterpolatorStringLookup.
      * @since 1.4
      */
     public StringLookup interpolatorStringLookup(final Map<String, StringLookup> stringLookupMap,
-            final StringLookup defaultStringLookup, final boolean addDefaultLookups) {
+        final StringLookup defaultStringLookup, final boolean addDefaultLookups) {
         return new InterpolatorStringLookup(stringLookupMap, defaultStringLookup, addDefaultLookups);
     }
 
@@ -644,39 +820,6 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Returns the DnsStringLookup singleton instance where the lookup key is one of:
-     * <ul>
-     * <li><b>name</b>: for the local host name, for example {@code EXAMPLE} but also {@code EXAMPLE.apache.org}.</li>
-     * <li><b>canonical-name</b>: for the local canonical host name, for example {@code EXAMPLE.apache.org}.</li>
-     * <li><b>address</b>: for the local host address, for example {@code 192.168.56.1}.</li>
-     * </ul>
-     *
-     * <p>
-     * Using a {@link StringLookup} from the {@link StringLookupFactory}:
-     * </p>
-     *
-     * <pre>
-     * StringLookupFactory.INSTANCE.dnsStringLookup().lookup("address|apache.org");
-     * </pre>
-     * <p>
-     * Using a {@link StringSubstitutor}:
-     * </p>
-     *
-     * <pre>
-     * StringSubstitutor.createInterpolator().replace("... ${dns:address|apache.org} ..."));
-     * </pre>
-     * <p>
-     * The above examples convert {@code "address|apache.org"} to {@code "95.216.24.32} (or {@code "40.79.78.1"}).
-     * </p>
-     *
-     * @return the DateStringLookup singleton instance.
-     * @since 1.8
-     */
-    public StringLookup dnsStringLookup() {
-        return DnsStringLookup.INSTANCE;
-    }
-
-    /**
      * Returns a new map-based lookup where the request for a lookup is answered with the value for that key.
      *
      * @param <V> the map value type.
@@ -684,7 +827,7 @@ public final class StringLookupFactory {
      * @return a new MapStringLookup.
      */
     public <V> StringLookup mapStringLookup(final Map<String, V> map) {
-        return MapStringLookup.on(map);
+        return FunctionStringLookup.on(map);
     }
 
     /**
@@ -693,7 +836,7 @@ public final class StringLookupFactory {
      * @return The NullStringLookup singleton instance.
      */
     public StringLookup nullStringLookup() {
-        return NullStringLookup.INSTANCE;
+        return StringLookupFactory.INSTANCE_NULL;
     }
 
     /**
@@ -852,7 +995,7 @@ public final class StringLookupFactory {
      * @return The SystemPropertyStringLookup singleton instance.
      */
     public StringLookup systemPropertyStringLookup() {
-        return SystemPropertyStringLookup.INSTANCE;
+        return StringLookupFactory.INSTANCE_SYSTEM_PROPERTIES;
     }
 
     /**

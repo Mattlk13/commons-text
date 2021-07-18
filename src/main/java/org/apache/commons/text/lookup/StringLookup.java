@@ -30,10 +30,11 @@ package org.apache.commons.text.lookup;
  *
  * @since 1.3
  */
+@FunctionalInterface
 public interface StringLookup {
 
     /**
-     * Looks up a String key to a String value.
+     * Looks up a String key to provide a String value.
      * <p>
      * The internal implementation may use any mechanism to return the value. The simplest implementation is to use a
      * Map. However, virtually any implementation is possible.
@@ -54,9 +55,8 @@ public interface StringLookup {
      * assertEquals("2", StringLookupFactory.mapStringLookup(map).lookup("number"));
      * </pre>
      *
-     * @param key
-     *            the key to look up, may be null
-     * @return The matching value, null if no match
+     * @param key the key to look up, may be null.
+     * @return The matching value, null if no match.
      */
     String lookup(String key);
 }

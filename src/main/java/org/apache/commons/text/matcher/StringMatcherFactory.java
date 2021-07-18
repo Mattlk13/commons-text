@@ -17,6 +17,9 @@
 
 package org.apache.commons.text.matcher;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Provides access to matchers defined in this package.
  *
@@ -33,7 +36,7 @@ public final class StringMatcherFactory {
      * Matches the double quote character.
      */
     private static final AbstractStringMatcher.CharMatcher DOUBLE_QUOTE_MATCHER = new AbstractStringMatcher.CharMatcher(
-            '"');
+        '"');
 
     /**
      * Defines the singleton for this class.
@@ -43,19 +46,19 @@ public final class StringMatcherFactory {
     /**
      * Matches no characters.
      */
-    private static final AbstractStringMatcher.NoMatcher NONE_MATCHER = new AbstractStringMatcher.NoMatcher();
+    private static final AbstractStringMatcher.NoneMatcher NONE_MATCHER = new AbstractStringMatcher.NoneMatcher();
 
     /**
      * Matches the single or double quote character.
      */
     private static final AbstractStringMatcher.CharSetMatcher QUOTE_MATCHER = new AbstractStringMatcher.CharSetMatcher(
-            "'\"".toCharArray());
+        "'\"".toCharArray());
 
     /**
      * Matches the double quote character.
      */
     private static final AbstractStringMatcher.CharMatcher SINGLE_QUOTE_MATCHER = new AbstractStringMatcher.CharMatcher(
-            '\'');
+        '\'');
 
     /**
      * Matches the space character.
@@ -66,7 +69,7 @@ public final class StringMatcherFactory {
      * Matches the same characters as StringTokenizer, namely space, tab, newline, form feed.
      */
     private static final AbstractStringMatcher.CharSetMatcher SPLIT_MATCHER = new AbstractStringMatcher.CharSetMatcher(
-            " \t\n\r\f".toCharArray());
+        " \t\n\r\f".toCharArray());
 
     /**
      * Matches the tab character.
@@ -86,10 +89,27 @@ public final class StringMatcherFactory {
     }
 
     /**
+     * Creates a matcher that matches all of the given matchers in order.
+     *
+     * @param stringMatchers the matcher
+     * @return a matcher that matches all of the given matchers in order.
+     * @since 1.9
+     */
+    public StringMatcher andMatcher(final StringMatcher... stringMatchers) {
+        final int len = ArrayUtils.getLength(stringMatchers);
+        if (len == 0) {
+            return NONE_MATCHER;
+        }
+        if (len == 1) {
+            return stringMatchers[0];
+        }
+        return new AbstractStringMatcher.AndStringMatcher(stringMatchers);
+    }
+
+    /**
      * Constructor that creates a matcher from a character.
      *
-     * @param ch
-     *            the character to match, must not be null
+     * @param ch the character to match, must not be null
      * @return a new Matcher for the given char
      */
     public StringMatcher charMatcher(final char ch) {
@@ -99,15 +119,15 @@ public final class StringMatcherFactory {
     /**
      * Constructor that creates a matcher from a set of characters.
      *
-     * @param chars
-     *            the characters to match, null or empty matches nothing
+     * @param chars the characters to match, null or empty matches nothing
      * @return a new matcher for the given char[]
      */
     public StringMatcher charSetMatcher(final char... chars) {
-        if (chars == null || chars.length == 0) {
+        final int len = ArrayUtils.getLength(chars);
+        if (len == 0) {
             return NONE_MATCHER;
         }
-        if (chars.length == 1) {
+        if (len == 1) {
             return new AbstractStringMatcher.CharMatcher(chars[0]);
         }
         return new AbstractStringMatcher.CharSetMatcher(chars);
@@ -116,15 +136,15 @@ public final class StringMatcherFactory {
     /**
      * Creates a matcher from a string representing a set of characters.
      *
-     * @param chars
-     *            the characters to match, null or empty matches nothing
+     * @param chars the characters to match, null or empty matches nothing
      * @return a new Matcher for the given characters
      */
     public StringMatcher charSetMatcher(final String chars) {
-        if (chars == null || chars.length() == 0) {
+        final int len = StringUtils.length(chars);
+        if (len == 0) {
             return NONE_MATCHER;
         }
-        if (chars.length() == 1) {
+        if (len == 1) {
             return new AbstractStringMatcher.CharMatcher(chars.charAt(0));
         }
         return new AbstractStringMatcher.CharSetMatcher(chars.toCharArray());
@@ -196,15 +216,25 @@ public final class StringMatcherFactory {
     /**
      * Creates a matcher from a string.
      *
-     * @param str
-     *            the string to match, null or empty matches nothing
+     * @param chars the string to match, null or empty matches nothing
+     * @return a new Matcher for the given String
+     * @since 1.9
+     */
+    public StringMatcher stringMatcher(final char... chars) {
+        final int length = ArrayUtils.getLength(chars);
+        return length == 0 ? NONE_MATCHER
+            : length == 1 ? new AbstractStringMatcher.CharMatcher(chars[0])
+                : new AbstractStringMatcher.CharArrayMatcher(chars);
+    }
+
+    /**
+     * Creates a matcher from a string.
+     *
+     * @param str the string to match, null or empty matches nothing
      * @return a new Matcher for the given String
      */
     public StringMatcher stringMatcher(final String str) {
-        if (str == null || str.length() == 0) {
-            return NONE_MATCHER;
-        }
-        return new AbstractStringMatcher.StringMatcher(str);
+        return StringUtils.isEmpty(str) ? NONE_MATCHER : stringMatcher(str.toCharArray());
     }
 
     /**

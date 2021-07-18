@@ -22,6 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Looks up keys from an XML document.
  * <p>
@@ -43,6 +45,16 @@ final class PropertiesStringLookup extends AbstractStringLookup {
      */
     static final PropertiesStringLookup INSTANCE = new PropertiesStringLookup();
 
+    /** Separates file and key. */
+    static final String SEPARATOR = "::";
+
+    /**
+     * Creates a lookup key for a given file and key.
+     */
+    static String toPropertyKey(final String file, final String key) {
+        return AbstractStringLookup.toLookupKey(file, SEPARATOR, key);
+    }
+
     /**
      * No need to build instances for now.
      */
@@ -59,8 +71,7 @@ final class PropertiesStringLookup extends AbstractStringLookup {
      * Note the use of "::" instead of ":" to allow for "C:" drive letters in paths.
      * </p>
      *
-     * @param key
-     *            the key to be looked up, may be null
+     * @param key the key to be looked up, may be null
      * @return The value associated with the key.
      */
     @Override
@@ -68,14 +79,14 @@ final class PropertiesStringLookup extends AbstractStringLookup {
         if (key == null) {
             return null;
         }
-        final String[] keys = key.split("::");
+        final String[] keys = key.split(SEPARATOR);
         final int keyLen = keys.length;
         if (keyLen < 2) {
-            throw IllegalArgumentExceptions
-                    .format("Bad properties key format [%s]; expected format is DocumentPath::Key.", key);
+            throw IllegalArgumentExceptions.format("Bad properties key format [%s]; expected format is %s.", key,
+                toPropertyKey("DocumentPath", "Key"));
         }
         final String documentPath = keys[0];
-        final String propertyKey = substringAfter(key, "::");
+        final String propertyKey = StringUtils.substringAfter(key, SEPARATOR);
         try {
             final Properties properties = new Properties();
             try (InputStream inputStream = Files.newInputStream(Paths.get(documentPath))) {
@@ -84,7 +95,7 @@ final class PropertiesStringLookup extends AbstractStringLookup {
             return properties.getProperty(propertyKey);
         } catch (final Exception e) {
             throw IllegalArgumentExceptions.format(e, "Error looking up properties [%s] and key [%s].", documentPath,
-                    propertyKey);
+                propertyKey);
         }
     }
 

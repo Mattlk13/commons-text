@@ -16,9 +16,9 @@
  */
 package org.apache.commons.text.similarity;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Arrays;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A similarity algorithm indicating the percentage of matched characters between two character sequences.
@@ -93,8 +93,7 @@ public class JaroWinklerSimilarity implements SimilarityScore<Double> {
             return 0d;
         }
         final double j = ((m / left.length() + m / right.length() + (m - (double) mtp[1] / 2) / m)) / 3;
-        final double jw = j < 0.7d ? j : j + defaultScalingFactor * mtp[2] * (1d - j);
-        return jw;
+        return j < 0.7d ? j : j + defaultScalingFactor * mtp[2] * (1d - j);
     }
 
     /**
@@ -105,7 +104,8 @@ public class JaroWinklerSimilarity implements SimilarityScore<Double> {
      * @return mtp array containing: matches, half transpositions, and prefix
      */
     protected static int[] matches(final CharSequence first, final CharSequence second) {
-        CharSequence max, min;
+        final CharSequence max;
+        final CharSequence min;
         if (first.length() > second.length()) {
             max = first;
             min = second;
@@ -151,11 +151,10 @@ public class JaroWinklerSimilarity implements SimilarityScore<Double> {
         }
         int prefix = 0;
         for (int mi = 0; mi < Math.min(4, min.length()); mi++) {
-            if (first.charAt(mi) == second.charAt(mi)) {
-                prefix++;
-            } else {
+            if (first.charAt(mi) != second.charAt(mi)) {
                 break;
             }
+            prefix++;
         }
         return new int[] {matches, halfTranspositions, prefix};
     }

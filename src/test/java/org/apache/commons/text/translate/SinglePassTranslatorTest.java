@@ -16,15 +16,15 @@
  */
 package org.apache.commons.text.translate;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit test for {@link SinglePassTranslator}
@@ -34,7 +34,7 @@ public class SinglePassTranslatorTest {
     private final SinglePassTranslator dummyTranslator = new SinglePassTranslator() {
 
         @Override
-        void translateWhole(final CharSequence input, final Writer out) throws IOException {
+        void translateWhole(final CharSequence input, final Writer writer) throws IOException {
             // noop
         }
     };
